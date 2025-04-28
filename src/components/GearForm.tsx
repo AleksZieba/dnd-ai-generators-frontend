@@ -1,7 +1,8 @@
 import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import './GearForm.css';
-import ResponseModal from './ResponseModal';
+import ResponseModal, { GearResponse } from './ResponseModal';
+import LoadingModal from './LoadingModal';
 
 interface GearRequest {
   name: string;
@@ -28,11 +29,15 @@ const GearForm: React.FC = () => {
   const [rarity, setRarity] = useState('');
   const [clothingPiece, setClothingPiece] = useState('');
   const [message, setMessage] = useState('');
-  const [modalContent, setModalContent] = useState<string | null>(null);
+  const [modalData, setModalData] = useState<GearResponse | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setMessage('');
+    setModalData(null);
+    setLoading(true);
+
     const payload: GearRequest = { name, type: type as any, subtype, rarity };
     if (type === 'Weapon') {
       payload.handedness = handedness as any;
@@ -42,10 +47,8 @@ const GearForm: React.FC = () => {
     }
 
     try {
-      const response = await axios.post<unknown>('/api/gear', payload);
-      // stringify with indentation for readability
-      const text = JSON.stringify(response.data, null, 2);
-      setModalContent(text);
+      const response = await axios.post<GearResponse>('/api/gear', payload);
+      setModalData(response.data);
       // reset form
       setName('');
       setType('');
@@ -56,10 +59,10 @@ const GearForm: React.FC = () => {
     } catch (error) {
       console.error(error);
       setMessage('Error sending gear request.');
+    } finally {
+      setLoading(false);
     }
   };
-
-  const armorClassOptions = armorOptions;
 
   return (
     <>
@@ -143,7 +146,7 @@ const GearForm: React.FC = () => {
                 required
               >
                 <option value="">Select Armor Class</option>
-                {armorClassOptions.map(opt => (
+                {armorOptions.map(opt => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
@@ -182,14 +185,15 @@ const GearForm: React.FC = () => {
           </select>
         </label>
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={loading}>Submit</button>
         {message && <p className="message">{message}</p>}
       </form>
 
-      {modalContent && (
+      {loading && <LoadingModal />}
+      {!loading && modalData && (
         <ResponseModal
-          content={modalContent}
-          onClose={() => setModalContent(null)}
+          data={modalData}
+          onClose={() => setModalData(null)}
         />
       )}
     </>
