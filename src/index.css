@@ -39,6 +39,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: transparent;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 600px) {
   .form { margin: 1rem; padding: 1rem; }
   .modal { width: 95%; }

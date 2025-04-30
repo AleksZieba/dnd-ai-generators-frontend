@@ -1,81 +1,127 @@
 import React from 'react';
 import './ResponseModal.css';
 
-export type GearResponse = {
-  Name: string;
-  Category: string;
-  Type?: string;
-  Rarity: string;
-  Cost: string;
+export interface GearResponse {
+  Name:        string;
+  Category?:   string;
+  Type?:       string;
+  Rarity:      'Common'|'Uncommon'|'Rare'|'Very Rare'|'Legendary'|'Artifact';
+  Cost?:       string;
   DamageDice?: string;
   DamageType?: string;
-  Weight: string;
-  Properties: string[];
-  Description: string;
-  // armor-only
-  ItemType?: string;
+  Weight?:     string;
+  Properties?: string[];
+  Description?:string;
+  ItemType?:   string;
   ArmorClass?: string;
   Attunement?: string;
-  Charges?: string;
-};
+  Charges?:    string;
+}
 
-interface ResponseModalProps {
+interface Props {
   data: GearResponse;
   onClose: () => void;
 }
 
-const ResponseModal: React.FC<ResponseModalProps> = ({ data, onClose }) => {
-  const handleCopy = () => {
-    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-  };
+const rarityColors: Record<string,string> = {
+  Common:     '#ffffff',
+  Uncommon:   '#1eff00',
+  Rare:       '#0070dd',
+  'Very Rare':'#a335ee',
+  Legendary:  '#ff8000',
+  Artifact:   '#e6cc80',
+};
 
-  const isWeapon = !!data.DamageDice;
+const ResponseModal: React.FC<Props> = ({ data, onClose }) => {
+  const color = rarityColors[data.Rarity] || '#fff';
+  const isWeapon = Boolean(data.DamageDice);
+  const propsArray = Array.isArray(data.Properties) ? data.Properties : [];
 
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h3>{data.Name}</h3>
+        <h3 style={{ color }}>{data.Name}</h3>
 
         <dl className="modal-list">
-          <dt>Category:</dt><dd>{data.Category}</dd>
-          {isWeapon && (
-            <>
-              <dt>Type:</dt><dd>{data.Type}</dd>
-            </>
-          )}
-          {!isWeapon && data.ItemType && (
-            <>
-              <dt>Item Type:</dt><dd>{data.ItemType}</dd>
-            </>
-          )}
-          <dt>Rarity:</dt><dd>{data.Rarity}</dd>
-          <dt>Cost:</dt><dd>{data.Cost}</dd>
+          {data.Category && <>
+            <dt>Category:</dt>
+            <dd>{data.Category}</dd>
+          </>}
+
+          {isWeapon && data.Type && <>
+            <dt>Type:</dt>
+            <dd>{data.Type}</dd>
+          </>}
+
+          {!isWeapon && data.ItemType && <>
+            <dt>Item Type:</dt>
+            <dd>{data.ItemType}</dd>
+          </>}
+
+          <dt>Rarity:</dt>
+          <dd style={{ color }}>{data.Rarity}</dd>
+
+          {data.Cost && <>
+            <dt>Cost:</dt>
+            <dd>{data.Cost}</dd>
+          </>}
+
           {isWeapon ? (
             <>
-              <dt>Damage:</dt><dd>{data.DamageDice} {data.DamageType}</dd>
+              {data.DamageDice && <>
+                <dt>Damage Dice:</dt>
+                <dd>{data.DamageDice}</dd>
+              </>}
+              {data.DamageType && <>
+                <dt>Damage Type:</dt>
+                <dd>{data.DamageType}</dd>
+              </>}
             </>
           ) : (
             <>
-              <dt>Armor Class:</dt><dd>{data.ArmorClass}</dd>
-              <dt>Attunement:</dt><dd>{data.Attunement}</dd>
+              {data.ArmorClass && <>
+                <dt>Armor Class:</dt>
+                <dd>{data.ArmorClass}</dd>
+              </>}
+              {data.Attunement && <>
+                <dt>Attunement:</dt>
+                <dd>{data.Attunement}</dd>
+              </>}
               {data.Charges && <>
-                <dt>Charges:</dt><dd>{data.Charges}</dd>
+                <dt>Charges:</dt>
+                <dd>{data.Charges}</dd>
               </>}
             </>
           )}
-          <dt>Weight:</dt><dd>{data.Weight}</dd>
-          <dt>Properties:</dt>
-          <dd>
-            <ul>
-              {data.Properties.map((p,i) => <li key={i}>{p}</li>)}
-            </ul>
-          </dd>
-          <dt>Description:</dt><dd>{data.Description}</dd>
+
+          {data.Weight && <>
+            <dt>Weight:</dt>
+            <dd>{data.Weight}</dd>
+          </>}
+
+          {propsArray.length > 0 && <>
+            <dt>Properties:</dt>
+            <dd>
+              <ul>
+                {propsArray.map((p,i) => <li key={i}>{p}</li>)}
+              </ul>
+            </dd>
+          </>}
+
+          {data.Description && <>
+            <dt>Description:</dt>
+            <dd style={{ whiteSpace: 'pre-wrap' }}>{data.Description}</dd>
+          </>}
         </dl>
 
         <div className="modal-buttons">
-          <button onClick={handleCopy}>Copy</button>
-          <button onClick={onClose}>Close</button>
+          <button 
+            type="button" 
+            onClick={() => navigator.clipboard.writeText(JSON.stringify(data, null, 2))}
+          >
+            Copy
+          </button>
+          <button type="button" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>
