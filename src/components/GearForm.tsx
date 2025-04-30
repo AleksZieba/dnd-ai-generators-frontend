@@ -2,7 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import ResponseModal, { GearResponse } from './ResponseModal';
 import './GearForm.css';
-import './ResponseModal.css'; // ensures your modal styles are loaded
+import './ResponseModal.css';
 
 interface GearRequest {
   name: string;
@@ -22,53 +22,54 @@ const armorOptions = ['Light', 'Medium', 'Heavy', 'Shield', 'Clothes'];
 const clothingPieceOptions = ['Helmet', 'Chestplate', 'Gauntlets', 'Boots', 'Cloak', 'Hat'];
 
 const GearForm: React.FC = () => {
-  // form fields
-  const [name, setName]               = useState('');
-  const [type, setType]               = useState<'Weapon'|'Armor'|''>('');
-  const [handedness, setHandedness]   = useState<typeof weaponHandOptions[number]|''>('');
-  const [subtype, setSubtype]         = useState('');
-  const [rarity, setRarity]           = useState('');
+  // form state
+  const [name, setName]                   = useState('');
+  const [type, setType]                   = useState<'Weapon'|'Armor'|''>('');
+  const [handedness, setHandedness]       = useState<typeof weaponHandOptions[number]|''>('');
+  const [subtype, setSubtype]             = useState('');
+  const [rarity, setRarity]               = useState('');
   const [clothingPiece, setClothingPiece] = useState('');
 
   // UI state
-  const [loading, setLoading]         = useState(false);
+  const [loading, setLoading]           = useState(false);
   const [responseData, setResponseData] = useState<GearResponse|null>(null);
-  const [showModal, setShowModal]     = useState(false);
+  const [showModal, setShowModal]       = useState(false);
   const [errorMessage, setErrorMessage] = useState<string|null>(null);
 
+  // submit handler
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage(null);
     try {
       const payload: GearRequest = { name, type: type as 'Weapon'|'Armor', subtype, rarity };
-      if (type === 'Weapon') {
-        payload.handedness = handedness as 'Single-Handed'|'Two-Handed';
-      }
-      if (type === 'Armor' && subtype !== 'Shield') {
-        payload.clothingPiece = clothingPiece;
-      }
+      if (type === 'Weapon') payload.handedness = handedness as 'Single-Handed'|'Two-Handed';
+      if (type === 'Armor' && subtype !== 'Shield') payload.clothingPiece = clothingPiece;
 
-      // We expect the backend to return exactly a GearResponse object:
       const { data } = await axios.post<GearResponse>('/api/gear', payload);
-
-      // Store it and open the modal:
       setResponseData(data);
       setShowModal(true);
-
-      // Optionally reset form fields:
-      setName('');
-      setType('');
-      setHandedness('');
-      setSubtype('');
-      setRarity('');
-      setClothingPiece('');
+      // reset form
+      setName(''); setType(''); setHandedness(''); setSubtype(''); setRarity(''); setClothingPiece('');
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(
-        err.response?.data?.message
-          || 'An unexpected error occurred while requesting gear.'
-      );
+      setErrorMessage(err.response?.data?.message || 'Error sending gear request.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // randomize handler
+  const handleRandomize = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const { data } = await axios.get<GearResponse>('/api/gear/random');
+      setResponseData(data);
+      setShowModal(true);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMessage(err.response?.data?.message || 'Error randomizing gear.');
     } finally {
       setLoading(false);
     }
@@ -76,14 +77,14 @@ const GearForm: React.FC = () => {
 
   return (
     <>
-      {/* Loading spinner overlay */}
+      {/* loading spinner */}
       {loading && (
         <div className="modal-backdrop">
           <div className="modal" style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
             <div style={{
               width: '3rem',
               height: '3rem',
@@ -99,6 +100,18 @@ const GearForm: React.FC = () => {
       <form className="form" onSubmit={handleSubmit}>
         <h2>Request Gear</h2>
 
+        <button
+          type="button"
+          className="randomize-btn"
+          onClick={handleRandomize}
+          disabled={loading}
+        >
+          Randomize
+        </button>
+
+        {/* horizontal separator */}
+        <hr className="separator" />
+
         <label>
           Item Name:
           <input
@@ -109,15 +122,15 @@ const GearForm: React.FC = () => {
           />
         </label>
 
+        {/* ...rest of your form fields unchanged... */}
+
         <label>
           Type:
           <select
             value={type}
             onChange={e => {
               setType(e.target.value as 'Weapon'|'Armor');
-              setHandedness('');
-              setSubtype('');
-              setClothingPiece('');
+              setHandedness(''); setSubtype(''); setClothingPiece('');
             }}
             required
           >
@@ -132,16 +145,11 @@ const GearForm: React.FC = () => {
             Weapon Category:
             <select
               value={handedness}
-              onChange={e => {
-                setHandedness(e.target.value as typeof weaponHandOptions[number]);
-                setSubtype('');
-              }}
+              onChange={e => { setHandedness(e.target.value as typeof weaponHandOptions[number]); setSubtype(''); }}
               required
             >
               <option value="">Select Category</option>
-              {weaponHandOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
+              {weaponHandOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </label>
         )}
@@ -155,9 +163,7 @@ const GearForm: React.FC = () => {
               required
             >
               <option value="">Select Weapon</option>
-              {weaponTypeOptions[handedness].map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
+              {weaponTypeOptions[handedness].map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </label>
         )}
@@ -167,16 +173,11 @@ const GearForm: React.FC = () => {
             Armor Class:
             <select
               value={subtype}
-              onChange={e => {
-                setSubtype(e.target.value);
-                setClothingPiece('');
-              }}
+              onChange={e => { setSubtype(e.target.value); setClothingPiece(''); }}
               required
             >
               <option value="">Select Armor Class</option>
-              {armorOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
+              {armorOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </label>
         )}
@@ -190,9 +191,7 @@ const GearForm: React.FC = () => {
               required
             >
               <option value="">Select Piece</option>
-              {clothingPieceOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
+              {clothingPieceOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </label>
         )}
@@ -218,12 +217,9 @@ const GearForm: React.FC = () => {
           Submit
         </button>
 
-        {errorMessage && (
-          <p className="message error">{errorMessage}</p>
-        )}
+        {errorMessage && <p className="message error">{errorMessage}</p>}
       </form>
 
-      {/* Render the modal as soon as we have valid responseData */}
       {showModal && responseData && (
         <ResponseModal
           data={responseData}

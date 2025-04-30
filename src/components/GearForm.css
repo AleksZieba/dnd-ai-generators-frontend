@@ -67,4 +67,11 @@
   text-align: center;
   color: var(--accent);
   font-size: 0.9rem;
+} 
+
+.form .separator {
+  border: none;
+  height: 1px;
+  background-color: var(--text-light);
+  margin: 1rem 0;
 }

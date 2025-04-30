@@ -27,7 +27,17 @@ body {
   color: var(--text);
   font-family: 'Lato', sans-serif;
   line-height: 1.6;
+  text-shadow:
+  1px  1px 0px #000,
+  -1px  1px 0px #000,
+  1px -1px 0px #000,
+  -1px -1px 0px #000;
 }
+
+body *[style*="color: #fff"],
+body *[style*="color: var(--text)"] {
+  text-shadow: none;
+} 
 
 /* 4) All headings use Tagesschrift */
 h1, h2, h3, h4, h5, h6 {
