@@ -241,7 +241,7 @@ const GearForm: React.FC = () => {
 
         {type === 'Armor' && subtype && subtype !== 'Shield' && (
           <label>
-            Clothing Piece:
+            {subtype === 'Clothes' ? 'Clothing Piece:' : 'Armor Piece:'}
             <select
               value={clothingPiece}
               onChange={e => setClothingPiece(e.target.value)}
@@ -249,7 +249,11 @@ const GearForm: React.FC = () => {
               disabled={loading}
             >
               <option value="">Select Piece</option>
-              {clothingPieceOptions.map(opt => (
+              {(
+                subtype === 'Clothes'
+                  ? ['Boots','Clothes','Cloak','Gloves','Headgear','Robes','Shoes']
+                  : ['Boots','Chest Armor','Greaves','Headgear']
+              ).map(opt => (
                 <option key={opt} value={opt}>
                   {opt}
                 </option>
