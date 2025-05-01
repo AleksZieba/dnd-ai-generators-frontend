@@ -4,7 +4,7 @@ import ResponseModal, { GearResponse } from './ResponseModal';
 import './GearForm.css';
 
 interface GearRequest {
-  name: string;
+  name?: string;
   type: 'Weapon' | 'Armor';
   handedness?: 'Single-Handed' | 'Two-Handed' | 'Versatile';
   subtype: string;
@@ -74,7 +74,10 @@ const GearForm: React.FC = () => {
     setLoading(true);
     setMessage('');
     try {
-      const payload: GearRequest = { name, type: type as 'Weapon' | 'Armor', subtype, rarity };
+      const payload: GearRequest = { type: type as 'Weapon' | 'Armor', subtype, rarity };
+      if (name.trim()) {
+        payload.name=name.trim();
+      }
       if (type === 'Weapon') payload.handedness = handedness as any;
       if (type === 'Armor' && subtype !== 'Shield') payload.clothingPiece = clothingPiece;
       if (description.trim()) payload.description = description.trim();
@@ -144,7 +147,7 @@ const GearForm: React.FC = () => {
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
-            required
+            placeholder="(Optional)"
             disabled={loading}
           />
         </label>
@@ -269,11 +272,11 @@ const GearForm: React.FC = () => {
         </label>
 
         <label>
-          Additional Details (optional):
+          Additional Details:
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder="Any extra flavor or requirements..."
+            placeholder="Optional extra flavor or requirements..."
             rows={3}
             disabled={loading}
           />
