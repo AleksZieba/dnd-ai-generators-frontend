@@ -2,49 +2,91 @@ import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import ResponseModal, { GearResponse } from './ResponseModal';
 import './GearForm.css';
-import './ResponseModal.css';
 
 interface GearRequest {
   name: string;
   type: 'Weapon' | 'Armor';
-  handedness?: 'Single-Handed' | 'Two-Handed';
+  handedness?: 'Single-Handed' | 'Versatile' | 'Two-Handed';
   subtype: string;
   rarity: string;
   clothingPiece?: string;
 }
 
-const weaponHandOptions = ['Single-Handed', 'Two-Handed'] as const;
+const weaponHandOptions = ['Single-Handed', 'Versatile', 'Two-Handed'] as const;
+
 const weaponTypeOptions: Record<typeof weaponHandOptions[number], string[]> = {
-  'Single-Handed': ['Dagger', 'Sword', 'Axe'],
-  'Two-Handed': ['Bow', 'Staff'],
+  'Single-Handed': [
+    'Club',
+    'Dagger',
+    'Flail',
+    'Hand Crossbows',
+    'Handaxe',
+    'Javelin',
+    'Light Hammer',
+    'Mace',
+    'Morningstar',
+    'Rapier',
+    'Scimitar',
+    'Sickle',
+    'Shortsword',
+    'War pick'
+  ],
+  'Versatile': [
+    'Battleaxe',
+    'Longsword',
+    'Quarterstaff',
+    'Spear',
+    'Staff',
+    'Trident',
+    'Warhammer'
+  ],
+  'Two-Handed': [
+    'Glaive',
+    'Greataxe',
+    'Greatclub',
+    'Greatsword',
+    'Halberd',
+    'Heavy Crossbow',
+    'Light Crossbow',
+    'Longbow',
+    'Maul',
+    'Pike',
+    'Shortbow'
+  ]
 };
-const armorOptions = ['Light', 'Medium', 'Heavy', 'Shield', 'Clothes'];
+
+const armorOptions = ['Light', 'Medium', 'Heavy', 'Shield', 'Clothes'] as const;
 const clothingPieceOptions = ['Helmet', 'Chestplate', 'Gauntlets', 'Boots', 'Cloak', 'Hat'];
 
 const GearForm: React.FC = () => {
-  // form state
   const [name, setName]                   = useState('');
   const [type, setType]                   = useState<'Weapon'|'Armor'|''>('');
   const [handedness, setHandedness]       = useState<typeof weaponHandOptions[number]|''>('');
   const [subtype, setSubtype]             = useState('');
   const [rarity, setRarity]               = useState('');
   const [clothingPiece, setClothingPiece] = useState('');
+  const [loading, setLoading]             = useState(false);
+  const [responseData, setResponseData]   = useState<GearResponse|null>(null);
+  const [showModal, setShowModal]         = useState(false);
+  const [errorMessage, setErrorMessage]   = useState<string|null>(null);
 
-  // UI state
-  const [loading, setLoading]           = useState(false);
-  const [responseData, setResponseData] = useState<GearResponse|null>(null);
-  const [showModal, setShowModal]       = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string|null>(null);
-
-  // submit handler
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage(null);
     try {
-      const payload: GearRequest = { name, type: type as 'Weapon'|'Armor', subtype, rarity };
-      if (type === 'Weapon') payload.handedness = handedness as 'Single-Handed'|'Two-Handed';
-      if (type === 'Armor' && subtype !== 'Shield') payload.clothingPiece = clothingPiece;
+      const payload: GearRequest = {
+        name,
+        type: type as 'Weapon'|'Armor',
+        subtype,
+        rarity
+      };
+      if (type === 'Weapon') {
+        payload.handedness = handedness as typeof weaponHandOptions[number];
+      }
+      if (type === 'Armor' && subtype !== 'Shield') {
+        payload.clothingPiece = clothingPiece;
+      }
 
       const { data } = await axios.post<GearResponse>('/api/gear', payload);
       setResponseData(data);
@@ -59,7 +101,6 @@ const GearForm: React.FC = () => {
     }
   };
 
-  // randomize handler
   const handleRandomize = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -77,21 +118,16 @@ const GearForm: React.FC = () => {
 
   return (
     <>
-      {/* loading spinner */}
       {loading && (
         <div className="modal-backdrop">
-          <div className="modal" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
+          <div className="modal" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
             <div style={{
               width: '3rem',
-              height: '3rem',
-              border: '0.5rem solid var(--surface)',
-              borderTop: '0.5rem solid var(--primary)',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
+              height:'3rem',
+              border:'0.5rem solid var(--surface)',
+              borderTop:'0.5rem solid var(--primary)',
+              borderRadius:'50%',
+              animation:'spin 1s linear infinite'
             }} />
           </div>
         </div>
@@ -109,7 +145,6 @@ const GearForm: React.FC = () => {
           Randomize
         </button>
 
-        {/* horizontal separator */}
         <hr className="separator" />
 
         <label>
@@ -121,8 +156,6 @@ const GearForm: React.FC = () => {
             required
           />
         </label>
-
-        {/* ...rest of your form fields unchanged... */}
 
         <label>
           Type:
@@ -140,20 +173,27 @@ const GearForm: React.FC = () => {
           </select>
         </label>
 
+        {/* Weapon Category */}
         {type === 'Weapon' && (
           <label>
             Weapon Category:
             <select
               value={handedness}
-              onChange={e => { setHandedness(e.target.value as typeof weaponHandOptions[number]); setSubtype(''); }}
+              onChange={e => {
+                setHandedness(e.target.value as typeof weaponHandOptions[number]);
+                setSubtype('');
+              }}
               required
             >
               <option value="">Select Category</option>
-              {weaponHandOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+              {weaponHandOptions.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
             </select>
           </label>
         )}
 
+        {/* Weapon Type */}
         {type === 'Weapon' && handedness && (
           <label>
             Weapon Type:
@@ -163,11 +203,14 @@ const GearForm: React.FC = () => {
               required
             >
               <option value="">Select Weapon</option>
-              {weaponTypeOptions[handedness].map(opt => <option key={opt} value={opt}>{opt}</option>)}
+              {weaponTypeOptions[handedness].map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
             </select>
           </label>
         )}
 
+        {/* Armor Class */}
         {type === 'Armor' && (
           <label>
             Armor Class:
@@ -177,11 +220,14 @@ const GearForm: React.FC = () => {
               required
             >
               <option value="">Select Armor Class</option>
-              {armorOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+              {armorOptions.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
             </select>
           </label>
         )}
 
+        {/* Clothing Piece */}
         {type === 'Armor' && subtype !== 'Shield' && (
           <label>
             Clothing Piece:
@@ -191,7 +237,9 @@ const GearForm: React.FC = () => {
               required
             >
               <option value="">Select Piece</option>
-              {clothingPieceOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+              {clothingPieceOptions.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
             </select>
           </label>
         )}
