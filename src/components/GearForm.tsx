@@ -73,7 +73,7 @@ const GearForm: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (hasBadChar(name) || hasBadChar(description)) {
-      setMessage('The backslash, tilde, single and double paranthesis characters (\\,\`,\',\") are not allowed in any field.');
+      setMessage('The backslash, tilde, single and double parantheses characters (\\,\`,\',\") are not allowed in any field.');
       return;
     }
     setLoading(true);
