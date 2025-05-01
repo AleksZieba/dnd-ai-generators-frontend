@@ -6,14 +6,14 @@ import './GearForm.css';
 interface GearRequest {
   name: string;
   type: 'Weapon' | 'Armor';
-  handedness?: 'Single-Handed' | 'Versatile' | 'Two-Handed';
+  handedness?: 'Single-Handed' | 'Two-Handed' | 'Versatile';
   subtype: string;
   rarity: string;
+  description?: string;
   clothingPiece?: string;
 }
 
-const weaponHandOptions = ['Single-Handed', 'Versatile', 'Two-Handed'] as const;
-
+const weaponHandOptions = ['Single-Handed', 'Two-Handed', 'Versatile'] as const;
 const weaponTypeOptions: Record<typeof weaponHandOptions[number], string[]> = {
   'Single-Handed': [
     'Club',
@@ -24,13 +24,12 @@ const weaponTypeOptions: Record<typeof weaponHandOptions[number], string[]> = {
     'Javelin',
     'Light Hammer',
     'Mace',
-    'Morningstar',
     'Rapier',
     'Scimitar',
-    'Sickle',
     'Shortsword',
+    'Sickle',
     'War pick'
-  ],
+  ].sort(),
   'Versatile': [
     'Battleaxe',
     'Longsword',
@@ -39,12 +38,12 @@ const weaponTypeOptions: Record<typeof weaponHandOptions[number], string[]> = {
     'Staff',
     'Trident',
     'Warhammer'
-  ],
+  ].sort(),
   'Two-Handed': [
     'Glaive',
-    'Greataxe',
     'Greatclub',
     'Greatsword',
+    'Greataxe',
     'Halberd',
     'Heavy Crossbow',
     'Light Crossbow',
@@ -52,50 +51,47 @@ const weaponTypeOptions: Record<typeof weaponHandOptions[number], string[]> = {
     'Maul',
     'Pike',
     'Shortbow'
-  ]
+  ].sort(),
 };
 
-const armorOptions = ['Light', 'Medium', 'Heavy', 'Shield', 'Clothes'] as const;
-const clothingPieceOptions = ['Helmet', 'Chestplate', 'Gauntlets', 'Boots', 'Cloak', 'Hat'];
+const armorOptions = ['Clothes', 'Heavy', 'Light', 'Medium', 'Shield'] as const;
+const clothingPieceOptions = ['Boots', 'Chestplate', 'Cloak', 'Gauntlets', 'Hat', 'Helmet'];
 
 const GearForm: React.FC = () => {
-  const [name, setName]                   = useState('');
-  const [type, setType]                   = useState<'Weapon'|'Armor'|''>('');
-  const [handedness, setHandedness]       = useState<typeof weaponHandOptions[number]|''>('');
-  const [subtype, setSubtype]             = useState('');
-  const [rarity, setRarity]               = useState('');
+  const [name, setName] = useState('');
+  const [type, setType] = useState<'Weapon' | 'Armor' | ''>('');
+  const [handedness, setHandedness] = useState<typeof weaponHandOptions[number] | ''>('');
+  const [subtype, setSubtype] = useState('');
+  const [rarity, setRarity] = useState('');
+  const [description, setDescription] = useState('');
   const [clothingPiece, setClothingPiece] = useState('');
-  const [loading, setLoading]             = useState(false);
-  const [responseData, setResponseData]   = useState<GearResponse|null>(null);
-  const [showModal, setShowModal]         = useState(false);
-  const [errorMessage, setErrorMessage]   = useState<string|null>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [modalData, setModalData] = useState<GearResponse | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMessage(null);
+    setMessage('');
     try {
-      const payload: GearRequest = {
-        name,
-        type: type as 'Weapon'|'Armor',
-        subtype,
-        rarity
-      };
-      if (type === 'Weapon') {
-        payload.handedness = handedness as typeof weaponHandOptions[number];
-      }
-      if (type === 'Armor' && subtype !== 'Shield') {
-        payload.clothingPiece = clothingPiece;
-      }
+      const payload: GearRequest = { name, type: type as 'Weapon' | 'Armor', subtype, rarity };
+      if (type === 'Weapon') payload.handedness = handedness as any;
+      if (type === 'Armor' && subtype !== 'Shield') payload.clothingPiece = clothingPiece;
+      if (description.trim()) payload.description = description.trim();
 
-      const { data } = await axios.post<GearResponse>('/api/gear', payload);
-      setResponseData(data);
-      setShowModal(true);
-      // reset form
-      setName(''); setType(''); setHandedness(''); setSubtype(''); setRarity(''); setClothingPiece('');
-    } catch (err: any) {
+      const res = await axios.post<GearResponse>('/api/gear', payload);
+      setModalData(res.data);
+      // clear form
+      setName('');
+      setType('');
+      setHandedness('');
+      setSubtype('');
+      setRarity('');
+      setDescription('');
+      setClothingPiece('');
+    } catch (err) {
       console.error(err);
-      setErrorMessage(err.response?.data?.message || 'Error sending gear request.');
+      setMessage('Error sending gear request.');
     } finally {
       setLoading(false);
     }
@@ -103,33 +99,28 @@ const GearForm: React.FC = () => {
 
   const handleRandomize = async () => {
     setLoading(true);
-    setErrorMessage(null);
+    setMessage('');
     try {
-      const { data } = await axios.get<GearResponse>('/api/gear/random');
-      setResponseData(data);
-      setShowModal(true);
-    } catch (err: any) {
+      const res = await axios.get<GearResponse>('/api/gear/random');
+      setModalData(res.data);
+    } catch (err) {
       console.error(err);
-      setErrorMessage(err.response?.data?.message || 'Error randomizing gear.');
+      setMessage('Error fetching random gear.');
     } finally {
       setLoading(false);
     }
   };
 
+  const closeModal = () => {
+    setModalData(null);
+  };
+
   return (
     <>
-      {loading && (
-        <div className="modal-backdrop">
-          <div className="modal" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <div style={{
-              width: '3rem',
-              height:'3rem',
-              border:'0.5rem solid var(--surface)',
-              borderTop:'0.5rem solid var(--primary)',
-              borderRadius:'50%',
-              animation:'spin 1s linear infinite'
-            }} />
-          </div>
+      {/* ← spinner overlay while waiting */}
+      {loading && !modalData && (
+        <div className="loading-backdrop">
+          <div className="loading-spinner" />
         </div>
       )}
 
@@ -138,14 +129,14 @@ const GearForm: React.FC = () => {
 
         <button
           type="button"
-          className="randomize-btn"
+          className="randomize-button"
           onClick={handleRandomize}
           disabled={loading}
         >
-          Randomize
+          {loading ? 'Loading…' : 'Randomize'}
         </button>
 
-        <hr className="separator" />
+        <hr />
 
         <label>
           Item Name:
@@ -154,6 +145,7 @@ const GearForm: React.FC = () => {
             value={name}
             onChange={e => setName(e.target.value)}
             required
+            disabled={loading}
           />
         </label>
 
@@ -162,10 +154,13 @@ const GearForm: React.FC = () => {
           <select
             value={type}
             onChange={e => {
-              setType(e.target.value as 'Weapon'|'Armor');
-              setHandedness(''); setSubtype(''); setClothingPiece('');
+              setType(e.target.value as any);
+              setHandedness('');
+              setSubtype('');
+              setClothingPiece('');
             }}
             required
+            disabled={loading}
           >
             <option value="">Select Type</option>
             <option value="Weapon">Weapon</option>
@@ -173,27 +168,28 @@ const GearForm: React.FC = () => {
           </select>
         </label>
 
-        {/* Weapon Category */}
         {type === 'Weapon' && (
           <label>
             Weapon Category:
             <select
               value={handedness}
               onChange={e => {
-                setHandedness(e.target.value as typeof weaponHandOptions[number]);
+                setHandedness(e.target.value as any);
                 setSubtype('');
               }}
               required
+              disabled={loading}
             >
               <option value="">Select Category</option>
               {weaponHandOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </select>
           </label>
         )}
 
-        {/* Weapon Type */}
         {type === 'Weapon' && handedness && (
           <label>
             Weapon Type:
@@ -201,44 +197,54 @@ const GearForm: React.FC = () => {
               value={subtype}
               onChange={e => setSubtype(e.target.value)}
               required
+              disabled={loading}
             >
               <option value="">Select Weapon</option>
               {weaponTypeOptions[handedness].map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </select>
           </label>
         )}
 
-        {/* Armor Class */}
         {type === 'Armor' && (
           <label>
             Armor Class:
             <select
               value={subtype}
-              onChange={e => { setSubtype(e.target.value); setClothingPiece(''); }}
+              onChange={e => {
+                setSubtype(e.target.value);
+                setClothingPiece('');
+              }}
               required
+              disabled={loading}
             >
               <option value="">Select Armor Class</option>
               {armorOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </select>
           </label>
         )}
 
-        {/* Clothing Piece */}
-        {type === 'Armor' && subtype !== 'Shield' && (
+        {type === 'Armor' && subtype && subtype !== 'Shield' && (
           <label>
             Clothing Piece:
             <select
               value={clothingPiece}
               onChange={e => setClothingPiece(e.target.value)}
               required
+              disabled={loading}
             >
               <option value="">Select Piece</option>
               {clothingPieceOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </select>
           </label>
@@ -250,6 +256,7 @@ const GearForm: React.FC = () => {
             value={rarity}
             onChange={e => setRarity(e.target.value)}
             required
+            disabled={loading}
           >
             <option value="">Select Rarity</option>
             <option value="Common">Common</option>
@@ -261,19 +268,25 @@ const GearForm: React.FC = () => {
           </select>
         </label>
 
+        <label>
+          Additional Details (optional):
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder="Any extra flavor or requirements..."
+            rows={3}
+            disabled={loading}
+          />
+        </label>
+
         <button type="submit" disabled={loading}>
-          Submit
+          {loading ? 'Loading…' : 'Submit'}
         </button>
 
-        {errorMessage && <p className="message error">{errorMessage}</p>}
-      </form>
+        {message && <p className="message">{message}</p>}
 
-      {showModal && responseData && (
-        <ResponseModal
-          data={responseData}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+        {modalData && <ResponseModal data={modalData} onClose={closeModal} />}
+      </form>
     </>
   );
 };
