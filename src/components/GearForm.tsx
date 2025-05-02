@@ -289,10 +289,11 @@ const GearForm: React.FC = () => {
         <label>
           Additional Details:
           <textarea
+            className="form-input"
             value={description}
             onChange={e => setDescription(e.target.value)}
             placeholder="Optional extra flavor or requirements..."
-            rows={3}
+            // rows={3}
             disabled={loading}
           />
         </label>

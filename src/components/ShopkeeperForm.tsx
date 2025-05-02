@@ -123,9 +123,10 @@ const ShopkeeperForm: React.FC = () => {
       </label>
 
       <label>
-        Additional Details (optional):
-        <input
-          type="text"
+        Additional Details:
+        <textarea
+          className="form-input"
+          placeholder="Optional extra flavor or requirements.."
           value={description}
           onChange={e => setDescription(e.target.value.replace(/["'\\]/g,''))}
         />

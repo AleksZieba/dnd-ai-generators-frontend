@@ -49,6 +49,17 @@ h1, h2, h3, h4, h5, h6 {
   background-color: transparent;
 }
 
+.form-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--field-bg);
+  background-color: var(--surface);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
