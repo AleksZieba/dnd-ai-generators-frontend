@@ -49,6 +49,7 @@ h1, h2, h3, h4, h5, h6 {
   background-color: transparent;
 }
 
+/* make all form inputs & selects fill their container width */
 .form-input {
   width: 100%;
   padding: 0.5rem;
@@ -58,6 +59,14 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text);
   font-size: 1rem;
   font-family: inherit;
+  box-sizing: border-box;
+  min-width: 8ch;
+}
+
+/* if you still have standalone <select> elements without .form-input */
+select {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @keyframes spin {

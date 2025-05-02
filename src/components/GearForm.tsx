@@ -148,6 +148,7 @@ const GearForm: React.FC = () => {
         <label>
           Item Name:
           <input
+            className="form-input"
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
@@ -159,6 +160,7 @@ const GearForm: React.FC = () => {
         <label>
           Type:
           <select
+            className="form-input"
             value={type}
             onChange={e => {
               setType(e.target.value as any);
@@ -179,7 +181,8 @@ const GearForm: React.FC = () => {
       {type === 'Jewelry' && (
         <label>
           Jewelry Category:
-          <select
+          <select 
+            className="form-input"
             value={subtype}
             onChange={e => setSubtype(e.target.value)}
             required
@@ -195,6 +198,7 @@ const GearForm: React.FC = () => {
           <label>
             Weapon Category:
             <select
+              className="form-input"
               value={handedness}
               onChange={e => {
                 setHandedness(e.target.value as any);
@@ -215,6 +219,7 @@ const GearForm: React.FC = () => {
           <label>
             Weapon Type:
             <select
+              className="form-input"
               value={subtype}
               onChange={e => setSubtype(e.target.value)}
               required
@@ -232,6 +237,7 @@ const GearForm: React.FC = () => {
           <label>
             Armor Class:
             <select
+              className="form-input"
               value={subtype}
               onChange={e => {
                 setSubtype(e.target.value);
@@ -252,6 +258,7 @@ const GearForm: React.FC = () => {
           <label>
             {subtype === 'Clothes' ? 'Clothing Piece:' : 'Armor Piece:'}
             <select
+              className="form-input"
               value={clothingPiece}
               onChange={e => setClothingPiece(e.target.value)}
               required
@@ -271,6 +278,7 @@ const GearForm: React.FC = () => {
         <label>
           Rarity:
           <select
+            className="form-input"
             value={rarity}
             onChange={e => setRarity(e.target.value)}
             required

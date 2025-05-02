@@ -33,7 +33,7 @@
   border: 1px solid #374151;       /* darker border */
   border-radius: var(--radius);
   font-size: 1rem;
-  background: #1F2937;              /* match surface */
+  background: var(--bg);              /* match surface */
   color: var(--text);
   font-family: inherit;
   resize: vertical;                 /* allow vertical-only resize */

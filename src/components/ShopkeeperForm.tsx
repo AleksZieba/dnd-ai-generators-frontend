@@ -25,8 +25,8 @@ const races = [
 const settlements = ['Outpost','Village','Town','City']
 const shopTypes  = [
   'Alchemist','Apo­thecary','Artificer','Blacksmith','Bookstore',
-  'Cobbler','Fletcher','Haberdashery','Innkeeper','Leatherworker',
-  'Pawnshop','Tailor'
+  'Cobbler','Fletcher','General Store','Haberdashery','Innkeeper',
+  'Leatherworker','Pawnshop','Tailor'
 ]
 
 const ShopkeeperForm: React.FC = () => {
@@ -80,6 +80,7 @@ const ShopkeeperForm: React.FC = () => {
       <label>
         Name (optional):
         <input
+          className="form-input"
           type="text"
           value={name}
           onChange={e => setName(e.target.value.replace(/["'\\]/g,''))}
