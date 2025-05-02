@@ -16,117 +16,116 @@ interface GearRequest {
 const weaponHandOptions = ['Single-Handed', 'Two-Handed', 'Versatile'] as const;
 const weaponTypeOptions: Record<typeof weaponHandOptions[number], string[]> = {
   'Single-Handed': [
-    'Club',
-    'Dagger',
-    'Flail',
-    'Hand Crossbows',
-    'Handaxe',
-    'Javelin',
-    'Light Hammer',
-    'Mace',
-    'Rapier',
-    'Scimitar',
-    'Shortsword',
-    'Sickle',
-    'War pick'
+    'Club', 'Dagger', 'Flail', 'Hand Crossbows', 'Handaxe',
+    'Javelin', 'Light Hammer', 'Mace', 'Rapier', 'Scimitar',
+    'Shortsword', 'Sickle', 'War pick'
   ].sort(),
   'Versatile': [
-    'Battleaxe',
-    'Longsword',
-    'Quarterstaff',
-    'Spear',
-    'Staff',
-    'Trident',
-    'Warhammer'
+    'Battleaxe', 'Longsword', 'Quarterstaff', 'Spear',
+    'Staff', 'Trident', 'Warhammer'
   ].sort(),
   'Two-Handed': [
-    'Glaive',
-    'Greatclub',
-    'Greatsword',
-    'Greataxe',
-    'Halberd',
-    'Heavy Crossbow',
-    'Light Crossbow',
-    'Longbow',
-    'Maul',
-    'Pike',
-    'Shortbow'
+    'Glaive', 'Greatclub', 'Greatsword', 'Greataxe', 'Halberd',
+    'Heavy Crossbow', 'Light Crossbow', 'Longbow', 'Maul',
+    'Pike', 'Shortbow'
   ].sort(),
 };
-
-const armorOptions = ['Clothes', 'Heavy', 'Light', 'Medium', 'Shield'] as const;
-const clothingPieceOptions = ['Boots', 'Chestplate', 'Cloak', 'Gauntlets', 'Hat', 'Helmet'];
+const armorOptions = ['Clothes', 'Light', 'Medium', 'Heavy', 'Shield'] as const;
 
 const GearForm: React.FC = () => {
-  const [name, setName] = useState('');
-  const [type, setType] = useState<'Weapon' | 'Armor' | ''>('');
-  const [handedness, setHandedness] = useState<typeof weaponHandOptions[number] | ''>('');
-  const [subtype, setSubtype] = useState('');
-  const [rarity, setRarity] = useState('');
+  const [name, setName]               = useState('');
+  const [type, setType]               = useState<'Weapon'|'Armor'|''>('');
+  const [handedness, setHandedness]   = useState<typeof weaponHandOptions[number] | ''>('');
+  const [subtype, setSubtype]         = useState('');
+  const [rarity, setRarity]           = useState('');
   const [description, setDescription] = useState('');
   const [clothingPiece, setClothingPiece] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [modalData, setModalData] = useState<GearResponse | null>(null);
+  const [loading, setLoading]         = useState(false);
+  const [message, setMessage]         = useState('');
+  const [lastRequest, setLastRequest] = useState<GearRequest | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentResponse, setCurrentResponse] = useState<GearResponse | null>(null);
+  const [lastWasRandom, setLastWasRandom] = useState(false);
+
+  // disallow \ ` ' "
   const hasBadChar = (s: string) => /[\\`'"]/.test(s);
 
+  // unified send function
+  async function sendRequest(
+    reqPayload: GearRequest | null,
+    random = false
+  ) {
+    setLoading(true);
+    setMessage('');
+    try {
+      let res;
+      if (random) {
+        res = await axios.get<GearResponse>('/api/gear/random');
+      } else {
+        if (!reqPayload) throw new Error('No payload to send');
+        res = await axios.post<GearResponse>('/api/gear', reqPayload);
+      }
+      setCurrentResponse(res.data);
+      setModalVisible(true);
+    } catch (err) {
+      console.error(err);
+      setMessage(random
+        ? 'Error fetching random gear.'
+        : 'Error sending gear request.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // form submit
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (hasBadChar(name) || hasBadChar(description)) {
-      setMessage('The backslash, tilde, single and double parantheses characters (\\,\`,\',\") are not allowed in any field.');
+      setMessage('The characters \\ ` \' " are not allowed.');
       return;
     }
-    setLoading(true);
-    setMessage('');
-    try {
-      const payload: GearRequest = { type: type as 'Weapon' | 'Armor', subtype, rarity };
-      if (name.trim()) {
-        payload.name=name.trim();
-      }
-      if (type === 'Weapon') payload.handedness = handedness as any;
-      if (type === 'Armor' && subtype !== 'Shield') payload.clothingPiece = clothingPiece;
-      if (description.trim()) payload.description = description.trim();
 
-      const res = await axios.post<GearResponse>('/api/gear', payload);
-      setModalData(res.data);
-      // clear form
-      setName('');
-      setType('');
-      setHandedness('');
-      setSubtype('');
-      setRarity('');
-      setDescription('');
-      setClothingPiece('');
-    } catch (err) {
-      console.error(err);
-      setMessage('Error sending gear request.');
-    } finally {
-      setLoading(false);
-    }
+    // build payload
+    const payload: GearRequest = { type: type as any, subtype, rarity };
+    if (name.trim())          payload.name           = name.trim();
+    if (type === 'Weapon')    payload.handedness     = handedness as any;
+    if (type === 'Armor' && subtype !== 'Shield')
+                               payload.clothingPiece  = clothingPiece;
+    if (description.trim())   payload.description    = description.trim();
+
+    // save for reroll
+    setLastRequest(payload);
+    setLastWasRandom(false);
+
+    // send right away
+    await sendRequest(payload, false);
+
+    // clear form
+    setName('');
+    setType('');
+    setHandedness('');
+    setSubtype('');
+    setRarity('');
+    setDescription('');
+    setClothingPiece('');
   };
 
+  // randomize
   const handleRandomize = async () => {
-    setLoading(true);
-    setMessage('');
-    try {
-      const res = await axios.get<GearResponse>('/api/gear/random');
-      setModalData(res.data);
-    } catch (err) {
-      console.error(err);
-      setMessage('Error fetching random gear.');
-    } finally {
-      setLoading(false);
-    }
+    setLastWasRandom(true);
+    setLastRequest(null);
+    await sendRequest(null, true);
   };
 
-  const closeModal = () => {
-    setModalData(null);
+  // reroll uses same logic
+  const handleReroll = async () => {
+    await sendRequest(lastRequest, lastWasRandom);
   };
 
   return (
     <>
-      {/* ← spinner overlay while waiting */}
-      {loading && !modalData && (
+      {/* loading spinner */}
+      {loading && (
         <div className="loading-backdrop">
           <div className="loading-spinner" />
         </div>
@@ -141,7 +140,7 @@ const GearForm: React.FC = () => {
           onClick={handleRandomize}
           disabled={loading}
         >
-          {loading ? 'Loading…' : 'Randomize'}
+          {loading && lastWasRandom ? 'Loading…' : 'Randomize'}
         </button>
 
         <hr />
@@ -190,9 +189,7 @@ const GearForm: React.FC = () => {
             >
               <option value="">Select Category</option>
               {weaponHandOptions.map(opt => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
           </label>
@@ -209,9 +206,7 @@ const GearForm: React.FC = () => {
             >
               <option value="">Select Weapon</option>
               {weaponTypeOptions[handedness].map(opt => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
           </label>
@@ -231,9 +226,7 @@ const GearForm: React.FC = () => {
             >
               <option value="">Select Armor Class</option>
               {armorOptions.map(opt => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
           </label>
@@ -249,14 +242,11 @@ const GearForm: React.FC = () => {
               disabled={loading}
             >
               <option value="">Select Piece</option>
-              {(
-                subtype === 'Clothes'
-                  ? ['Boots','Clothes','Cloak','Gloves','Headgear','Robes','Shoes']
-                  : ['Boots','Chest Armor','Greaves','Headgear']
+              {(subtype === 'Clothes'
+                ? ['Boots','Clothes','Cloak','Gloves','Headgear','Robes','Shoes']
+                : ['Boots','Chest Armor','Greaves','Headgear']
               ).map(opt => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
           </label>
@@ -291,14 +281,27 @@ const GearForm: React.FC = () => {
           />
         </label>
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Loading…' : 'Submit'}
+        <button type="submit" disabled={loading && !lastWasRandom}>
+          {loading && !lastWasRandom ? 'Loading…' : 'Submit'}
         </button>
 
         {message && <p className="message">{message}</p>}
-
-        {modalData && <ResponseModal data={modalData} onClose={closeModal} />}
       </form>
+
+      {modalVisible && currentResponse && (
+        <ResponseModal
+          data={currentResponse}
+          onClose={() => setModalVisible(false)}
+          onReroll={handleReroll}
+          loading={loading}
+        />
+      )}
+      
+      {loading && (
+        <div className="loading-backdrop">
+          <div className="loading-spinner" />
+        </div>
+      )}
     </>
   );
 };

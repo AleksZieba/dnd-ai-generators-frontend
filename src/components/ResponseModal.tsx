@@ -18,9 +18,11 @@ export interface GearResponse {
   Charges?:    string;
 }
 
-interface Props {
+interface ResponseModalProps {
   data: GearResponse;
   onClose: () => void;
+  onReroll: () => void;
+  loading: boolean;         
 }
 
 const rarityColors: Record<string,string> = {
@@ -32,7 +34,12 @@ const rarityColors: Record<string,string> = {
   Artifact:   '#e6cc80',
 };
 
-const ResponseModal: React.FC<Props> = ({ data, onClose }) => {
+const ResponseModal: React.FC<ResponseModalProps> = ({
+  data,
+  onClose,
+  onReroll,
+  loading,                
+}) => {
   const color = rarityColors[data.Rarity] || '#fff';
   const isWeapon = Boolean(data.DamageDice);
   const propsArray = Array.isArray(data.Properties) ? data.Properties : [];
@@ -43,85 +50,126 @@ const ResponseModal: React.FC<Props> = ({ data, onClose }) => {
         <h3 style={{ color }}>{data.Name}</h3>
 
         <dl className="modal-list">
-          {data.Category && <>
-            <dt>Category:</dt>
-            <dd>{data.Category}</dd>
-          </>}
+          {data.Category && (
+            <>
+              <dt>Category:</dt>
+              <dd>{data.Category}</dd>
+            </>
+          )}
 
-          {isWeapon && data.Type && <>
-            <dt>Type:</dt>
-            <dd>{data.Type}</dd>
-          </>}
+          {isWeapon && data.Type && (
+            <>
+              <dt>Type:</dt>
+              <dd>{data.Type}</dd>
+            </>
+          )}
 
-          {!isWeapon && data.ItemType && <>
-            <dt>Item Type:</dt>
-            <dd>{data.ItemType}</dd>
-          </>}
+          {!isWeapon && data.ItemType && (
+            <>
+              <dt>Item Type:</dt>
+              <dd>{data.ItemType}</dd>
+            </>
+          )}
 
           <dt>Rarity:</dt>
           <dd style={{ color }}>{data.Rarity}</dd>
 
-          {data.Cost && <>
-            <dt>Cost:</dt>
-            <dd>{data.Cost}</dd>
-          </>}
-
-          {isWeapon ? (
+          {data.Cost && (
             <>
-              {data.DamageDice && <>
-                <dt>Damage Dice:</dt>
-                <dd>{data.DamageDice}</dd>
-              </>}
-              {data.DamageType && <>
-                <dt>Damage Type:</dt>
-                <dd>{data.DamageType}</dd>
-              </>}
-            </>
-          ) : (
-            <>
-              {data.ArmorClass && <>
-                <dt>Armor Class:</dt>
-                <dd>{data.ArmorClass}</dd>
-              </>}
-              {data.Attunement && <>
-                <dt>Attunement:</dt>
-                <dd>{data.Attunement}</dd>
-              </>}
-              {data.Charges && <>
-                <dt>Charges:</dt>
-                <dd>{data.Charges}</dd>
-              </>}
+              <dt>Cost:</dt>
+              <dd>{data.Cost}</dd>
             </>
           )}
 
-          {data.Weight && <>
-            <dt>Weight:</dt>
-            <dd>{data.Weight}</dd>
-          </>}
+          {isWeapon ? (
+            <>
+              {data.DamageDice && (
+                <>
+                  <dt>Damage Dice:</dt>
+                  <dd>{data.DamageDice}</dd>
+                </>
+              )}
+              {data.DamageType && (
+                <>
+                  <dt>Damage Type:</dt>
+                  <dd>{data.DamageType}</dd>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              {data.ArmorClass && (
+                <>
+                  <dt>Armor Class:</dt>
+                  <dd>{data.ArmorClass}</dd>
+                </>
+              )}
+              {data.Attunement && (
+                <>
+                  <dt>Attunement:</dt>
+                  <dd>{data.Attunement}</dd>
+                </>
+              )}
+              {data.Charges && (
+                <>
+                  <dt>Charges:</dt>
+                  <dd>{data.Charges}</dd>
+                </>
+              )}
+            </>
+          )}
 
-          {propsArray.length > 0 && <>
-            <dt>Properties:</dt>
-            <dd>
-              <ul>
-                {propsArray.map((p,i) => <li key={i}>{p}</li>)}
-              </ul>
-            </dd>
-          </>}
+          {data.Weight && (
+            <>
+              <dt>Weight:</dt>
+              <dd>{data.Weight}</dd>
+            </>
+          )}
 
-          {data.Description && <>
-            <dt>Description:</dt>
-            <dd style={{ whiteSpace: 'pre-wrap' }}>{data.Description}</dd>
-          </>}
+          {propsArray.length > 0 && (
+            <>
+              <dt>Properties:</dt>
+              <dd>
+                <ul>
+                  {propsArray.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )}
+
+          {data.Description && (
+            <>
+              <dt>Description:</dt>
+              <dd style={{ whiteSpace: 'pre-wrap' }}>
+                {data.Description}
+              </dd>
+            </>
+          )}
         </dl>
 
         <div className="modal-buttons">
-          <button 
-            type="button" 
-            onClick={() => navigator.clipboard.writeText(JSON.stringify(data, null, 2))}
+          <button
+            type="button"
+            onClick={onReroll}
+            disabled={loading}
+          >
+            {loading ? 'Loading…' : 'Re-roll'}
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              navigator.clipboard.writeText(
+                JSON.stringify(data, null, 2)
+              )
+            }
           >
             Copy
           </button>
-          <button type="button" onClick={onClose}>Close</button>
+          <button type="button" onClick={onClose}>
+            Close
+          </button>
         </div>
       </div>
     </div>
