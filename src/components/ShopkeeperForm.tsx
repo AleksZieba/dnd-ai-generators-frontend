@@ -1,9 +1,7 @@
 import React, { useState, FormEvent } from 'react'
 import axios from 'axios'
-import ResponseModal, {
-  ShopkeeperResponse
-} from './ShopkeeperModal'   // we’ll build this next
-import './ShopkeeperForm.css' // you can just copy your GearForm.css and tweak as needed
+import ResponseModal, { ShopkeeperResponse } from './ShopkeeperModal'
+import './ShopkeeperForm.css'
 
 interface ShopkeeperRequest {
   name?: string
@@ -24,28 +22,34 @@ const races = [
 ]
 const settlements = ['Outpost','Village','Town','City']
 const shopTypes  = [
-  'Alchemist','Apo­thecary','Artificer','Blacksmith','Bookstore',
+  'Alchemist','Apothecary','Artificer','Blacksmith','Bookstore',
   'Cobbler','Fletcher','General Store','Haberdashery','Innkeeper',
   'Leatherworker','Pawnshop','Tailor'
 ]
 
 const ShopkeeperForm: React.FC = () => {
-  const [name, setName]               = useState('')
-  const [race, setRace]               = useState('')
-  const [settlementSize, setSettlementSize] = useState('')
-  const [shopType, setShopType]       = useState('')
-  const [description, setDescription] = useState('')
-  const [loading, setLoading]         = useState(false)
-  const [response, setResponse]       = useState<ShopkeeperResponse| null>(null)
-  const [error, setError]             = useState('')
+  const [name, setName]               = useState<string>('')
+  const [race, setRace]               = useState<string>('')
+  const [settlementSize, setSettlementSize] = useState<string>('')
+  const [shopType, setShopType]       = useState<string>('')
+  const [description, setDescription] = useState<string>('')
+  const [loading, setLoading]         = useState<boolean>(false)
+  const [response, setResponse]       = useState<ShopkeeperResponse|null>(null)
+  const [error, setError]             = useState<string>('')
 
+  // POST /api/shopkeeper with the form payload
   const doRequest = async () => {
     setError('')
     setLoading(true)
     try {
-      const payload: ShopkeeperRequest = { race, settlementSize, shopType }
-      if (name)        payload.name        = name
-      if (description) payload.description = description
+      const payload: ShopkeeperRequest = {
+        race,
+        settlementSize,
+        shopType,
+      }
+      if (name.trim())        payload.name        = name
+      if (description.trim()) payload.description = description
+
       const { data } = await axios.post<ShopkeeperResponse>(
         '/api/shopkeeper',
         payload
@@ -53,6 +57,22 @@ const ShopkeeperForm: React.FC = () => {
       setResponse(data)
     } catch {
       setError('Error generating shopkeeper.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // POST /api/shopkeeper/random to get a totally random shopkeeper
+  const doRandomize = async () => {
+    setError('')
+    setLoading(true)
+    try {
+      const { data } = await axios.post<ShopkeeperResponse>(
+        '/api/shopkeeper/random'
+      )
+      setResponse(data)
+    } catch {
+      setError('Error randomizing shopkeeper.')
     } finally {
       setLoading(false)
     }
@@ -69,21 +89,23 @@ const ShopkeeperForm: React.FC = () => {
 
       <button
         type="button"
-        onClick={doRequest}
+        className="btn-primary"
+        onClick={doRandomize}
         disabled={loading}
       >
         {loading ? 'Loading…' : 'Randomize'}
       </button>
 
-      <hr/>
+      <hr />
 
       <label>
-        Name (optional):
+        Shopkeeper Name:
         <input
           className="form-input"
           type="text"
+          placeholder="(Optional)"
           value={name}
-          onChange={e => setName(e.target.value.replace(/["'\\]/g,''))}
+          onChange={e => setName(e.target.value.replace(/["'\\]/g, ''))}
         />
       </label>
 
@@ -95,7 +117,9 @@ const ShopkeeperForm: React.FC = () => {
           onChange={e => setRace(e.target.value)}
         >
           <option value="">Select Race</option>
-          {races.map(r => <option key={r} value={r}>{r}</option>)}
+          {races.map(r => (
+            <option key={r} value={r}>{r}</option>
+          ))}
         </select>
       </label>
 
@@ -107,7 +131,9 @@ const ShopkeeperForm: React.FC = () => {
           onChange={e => setSettlementSize(e.target.value)}
         >
           <option value="">Select Settlement</option>
-          {settlements.map(s => <option key={s} value={s}>{s}</option>)}
+          {settlements.map(s => (
+            <option key={s} value={s}>{s}</option>
+          ))}
         </select>
       </label>
 
@@ -119,7 +145,9 @@ const ShopkeeperForm: React.FC = () => {
           onChange={e => setShopType(e.target.value)}
         >
           <option value="">Select Type</option>
-          {shopTypes.map(s => <option key={s} value={s}>{s}</option>)}
+          {shopTypes.map(s => (
+            <option key={s} value={s}>{s}</option>
+          ))}
         </select>
       </label>
 
@@ -127,14 +155,14 @@ const ShopkeeperForm: React.FC = () => {
         Additional Details:
         <textarea
           className="form-input"
-          placeholder="Optional extra flavor or requirements.."
+          placeholder="Optional extra flavor or requirements..."
           value={description}
-          onChange={e => setDescription(e.target.value.replace(/["'\\]/g,''))}
+          onChange={e => setDescription(e.target.value.replace(/["'\\]/g, ''))}
         />
       </label>
 
-      <button type="submit" disabled={loading}>
-        Submit
+      <button type="submit" className="btn-primary" disabled={loading}>
+        {loading ? 'Loading…' : 'Submit'}
       </button>
 
       {error && <p className="message">{error}</p>}
