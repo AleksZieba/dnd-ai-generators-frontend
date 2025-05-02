@@ -5,7 +5,7 @@ import './GearForm.css';
 
 interface GearRequest {
   name?: string;
-  type: 'Weapon' | 'Armor';
+  type: 'Weapon' | 'Armor' | 'Jewelry';
   handedness?: 'Single-Handed' | 'Two-Handed' | 'Versatile';
   subtype: string;
   rarity: string;
@@ -34,7 +34,7 @@ const armorOptions = ['Clothes', 'Light', 'Medium', 'Heavy', 'Shield'] as const;
 
 const GearForm: React.FC = () => {
   const [name, setName]               = useState('');
-  const [type, setType]               = useState<'Weapon'|'Armor'|''>('');
+  const [type, setType]               = useState<'Weapon'|'Armor'|'Jewelry'|''>('');
   const [handedness, setHandedness]   = useState<typeof weaponHandOptions[number] | ''>('');
   const [subtype, setSubtype]         = useState('');
   const [rarity, setRarity]           = useState('');
@@ -172,8 +172,24 @@ const GearForm: React.FC = () => {
             <option value="">Select Type</option>
             <option value="Weapon">Weapon</option>
             <option value="Armor">Armor</option>
+            <option value="Jewelry">Jewelry</option>
           </select>
         </label>
+
+      {type === 'Jewelry' && (
+        <label>
+          Jewelry Category:
+          <select
+            value={subtype}
+            onChange={e => setSubtype(e.target.value)}
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="Ring">Ring</option>
+            <option value="Necklace">Necklace</option>
+          </select>
+        </label>
+      )}
 
         {type === 'Weapon' && (
           <label>
@@ -296,7 +312,7 @@ const GearForm: React.FC = () => {
           loading={loading}
         />
       )}
-      
+
       {loading && (
         <div className="loading-backdrop">
           <div className="loading-spinner" />

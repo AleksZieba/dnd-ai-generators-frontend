@@ -57,7 +57,7 @@ const ResponseModal: React.FC<ResponseModalProps> = ({
             </>
           )}
 
-          {isWeapon && data.Type && (
+          {data.Type && (
             <>
               <dt>Type:</dt>
               <dd>{data.Type}</dd>
