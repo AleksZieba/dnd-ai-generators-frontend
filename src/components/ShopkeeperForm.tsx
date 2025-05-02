@@ -1,14 +1,14 @@
-import React, { useState, FormEvent } from 'react'
-import axios from 'axios'
-import ResponseModal, { ShopkeeperResponse } from './ShopkeeperModal'
-import './ShopkeeperForm.css'
+import React, { useState, FormEvent } from 'react';
+import axios from 'axios';
+import ResponseModal, { ShopkeeperResponse } from './ShopkeeperModal';
+import './ShopkeeperForm.css';
 
 interface ShopkeeperRequest {
-  name?: string
-  race: string
-  settlementSize: string
-  shopType: string
-  description?: string
+  name?: string;
+  race: string;
+  settlementSize: string;
+  shopType: string;
+  description?: string;
 }
 
 const races = [
@@ -19,69 +19,59 @@ const races = [
   'Human','Kenku','Kobold','Lizardfolk','Minotaur','Orc','Satyr',
   'Sea Elf','Shadar-kai','Shifter','Tabaxi','Tiefling','Tortle',
   'Triton','Water Genasi','Yuan-ti'
-]
-const settlements = ['Outpost','Village','Town','City']
-const shopTypes  = [
+] as const;
+
+const settlements = ['Outpost','Village','Town','City'] as const;
+
+const shopTypes = [
   'Alchemist','Apothecary','Artificer','Blacksmith','Bookstore',
   'Cobbler','Fletcher','General Store','Haberdashery','Innkeeper',
   'Leatherworker','Pawnshop','Tailor'
-]
+] as const;
+
+const sanitize = (s: string) => s.replace(/[\\'"`]/g, '');
 
 const ShopkeeperForm: React.FC = () => {
-  const [name, setName]               = useState<string>('')
-  const [race, setRace]               = useState<string>('')
-  const [settlementSize, setSettlementSize] = useState<string>('')
-  const [shopType, setShopType]       = useState<string>('')
-  const [description, setDescription] = useState<string>('')
-  const [loading, setLoading]         = useState<boolean>(false)
-  const [response, setResponse]       = useState<ShopkeeperResponse|null>(null)
-  const [error, setError]             = useState<string>('')
+  const [name, setName]               = useState('');
+  const [race, setRace]               = useState('');
+  const [settlementSize, setSettlementSize] = useState('');
+  const [shopType, setShopType]       = useState('');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [response, setResponse]       = useState<ShopkeeperResponse | null>(null);
+  const [error, setError]             = useState('');
 
-  // POST /api/shopkeeper with the form payload
-  const doRequest = async () => {
-    setError('')
-    setLoading(true)
+  // Randomize button → GET /api/shopkeeper/random
+  const handleRandomize = async () => {
+    setError('');
+    setLoading(true);
     try {
-      const payload: ShopkeeperRequest = {
-        race,
-        settlementSize,
-        shopType,
-      }
-      if (name.trim())        payload.name        = name
-      if (description.trim()) payload.description = description
-
-      const { data } = await axios.post<ShopkeeperResponse>(
-        '/api/shopkeeper',
-        payload
-      )
-      setResponse(data)
+      const { data } = await axios.get<ShopkeeperResponse>('/api/shopkeeper/random');
+      setResponse(data);
     } catch {
-      setError('Error generating shopkeeper.')
+      setError('Error generating shopkeeper.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  // POST /api/shopkeeper/random to get a totally random shopkeeper
-  const doRandomize = async () => {
-    setError('')
-    setLoading(true)
+  // Submit form → POST /api/shopkeeper
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
-      const { data } = await axios.post<ShopkeeperResponse>(
-        '/api/shopkeeper/random'
-      )
-      setResponse(data)
+      const payload: ShopkeeperRequest = { race, settlementSize, shopType };
+      if (name.trim())        payload.name        = sanitize(name.trim());
+      if (description.trim()) payload.description = sanitize(description.trim());
+      const { data } = await axios.post<ShopkeeperResponse>('/api/shopkeeper', payload);
+      setResponse(data);
     } catch {
-      setError('Error randomizing shopkeeper.')
+      setError('Error generating shopkeeper.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    doRequest()
-  }
+  };
 
   return (
     <form className="form" onSubmit={handleSubmit}>
@@ -89,8 +79,7 @@ const ShopkeeperForm: React.FC = () => {
 
       <button
         type="button"
-        className="btn-primary"
-        onClick={doRandomize}
+        onClick={handleRandomize}
         disabled={loading}
       >
         {loading ? 'Loading…' : 'Randomize'}
@@ -99,13 +88,14 @@ const ShopkeeperForm: React.FC = () => {
       <hr />
 
       <label>
-        Shopkeeper Name:
+        Name (optional):
         <input
           className="form-input"
           type="text"
           placeholder="(Optional)"
           value={name}
-          onChange={e => setName(e.target.value.replace(/["'\\]/g, ''))}
+          disabled={loading}
+          onChange={e => setName(sanitize(e.target.value))}
         />
       </label>
 
@@ -114,6 +104,7 @@ const ShopkeeperForm: React.FC = () => {
         <select
           required
           value={race}
+          disabled={loading}
           onChange={e => setRace(e.target.value)}
         >
           <option value="">Select Race</option>
@@ -128,6 +119,7 @@ const ShopkeeperForm: React.FC = () => {
         <select
           required
           value={settlementSize}
+          disabled={loading}
           onChange={e => setSettlementSize(e.target.value)}
         >
           <option value="">Select Settlement</option>
@@ -142,6 +134,7 @@ const ShopkeeperForm: React.FC = () => {
         <select
           required
           value={shopType}
+          disabled={loading}
           onChange={e => setShopType(e.target.value)}
         >
           <option value="">Select Type</option>
@@ -157,24 +150,29 @@ const ShopkeeperForm: React.FC = () => {
           className="form-input"
           placeholder="Optional extra flavor or requirements..."
           value={description}
-          onChange={e => setDescription(e.target.value.replace(/["'\\]/g, ''))}
+          disabled={loading}
+          onChange={e => setDescription(sanitize(e.target.value))}
         />
       </label>
 
-      <button type="submit" className="btn-primary" disabled={loading}>
-        {loading ? 'Loading…' : 'Submit'}
+      <button
+        type="submit"
+        disabled={loading}
+      >
+        Submit
       </button>
 
-      {error && <p className="message">{error}</p>}
+      {error && <p className="message error">{error}</p>}
 
       {response && (
         <ResponseModal
           data={response}
           onClose={() => setResponse(null)}
+          onReroll={handleRandomize} 
         />
       )}
     </form>
-  )
-}
+  );
+};
 
-export default ShopkeeperForm
+export default ShopkeeperForm;
