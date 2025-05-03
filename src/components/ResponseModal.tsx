@@ -34,6 +34,36 @@ const rarityColors: Record<string,string> = {
   Artifact:   '#e6cc80',
 };
 
+function formatPlainText(data: GearResponse): string {
+  const lines: string[] = [];
+
+  lines.push(`Name: ${data.Name}`);
+  lines.push(`Category: ${data.Category}`);
+  if (data.Type)       lines.push(`Type: ${data.Type}`);
+  if (data.ItemType)   lines.push(`Item Type: ${data.ItemType}`);
+  lines.push(`Rarity: ${data.Rarity}`);
+  lines.push(`Cost: ${data.Cost}`);
+  if (data.DamageDice && data.DamageType) {
+    lines.push(`Damage: ${data.DamageDice} ${data.DamageType}`);
+  }
+  if (data.ArmorClass) lines.push(`Armor Class: ${data.ArmorClass}`);
+  if (data.Attunement) lines.push(`Attunement: ${data.Attunement}`);
+  if (data.Charges)    lines.push(`Charges: ${data.Charges}`);
+  lines.push(`Weight: ${data.Weight}`);
+
+  // safe-guard against undefined
+  const props = Array.isArray(data.Properties) ? data.Properties : [];
+  if (props.length > 0) {
+    lines.push(`Properties:`);
+    for (const p of props) {
+      lines.push(`  • ${p}`);
+    }
+  }
+
+  lines.push(`Description: ${data.Description}`);
+  return lines.join(`\n`);
+}
+
 const ResponseModal: React.FC<ResponseModalProps> = ({
   data,
   onClose,
@@ -158,12 +188,9 @@ const ResponseModal: React.FC<ResponseModalProps> = ({
             {loading ? 'Loading…' : 'Re-roll'}
           </button>
           <button
-            type="button"
-            onClick={() =>
-              navigator.clipboard.writeText(
-                JSON.stringify(data, null, 2)
-              )
-            }
+            onClick={() => {
+              navigator.clipboard.writeText(formatPlainText(data));
+            }}
           >
             Copy
           </button>

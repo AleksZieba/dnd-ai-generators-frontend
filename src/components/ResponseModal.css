@@ -91,6 +91,7 @@
     cursor: pointer;
     font-weight: 500;
     transition: background 0.2s ease;
+    box-shadow: var(--shadow);
     /* inherit the responsive font-size */
   }
   
