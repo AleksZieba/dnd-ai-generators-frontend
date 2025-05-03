@@ -46,8 +46,7 @@ const GearForm: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentResponse, setCurrentResponse] = useState<GearResponse | null>(null);
   const [lastWasRandom, setLastWasRandom] = useState(false);
-
-  // disallow \ ` ' "
+  
   const hasBadChar = (s: string) => /[\\`'"]/.test(s);
 
   // unified send function

@@ -29,52 +29,60 @@ const shopTypes = [
   'Leatherworker','Pawnshop','Tailor'
 ] as const;
 
+// Strip backslashes and quotes for security
 const sanitize = (s: string) => s.replace(/[\\'"`]/g, '');
 
 const ShopkeeperForm: React.FC = () => {
-  const [name, setName]               = useState('')
-  const [race, setRace]               = useState('')
-  const [settlementSize, setSettlementSize] = useState('')
-  const [shopType, setShopType]       = useState('')
-  const [description, setDescription] = useState('')
-  const [loading, setLoading]         = useState(false)
-  const [response, setResponse]       = useState<ShopkeeperResponse | null>(null)
-  const [error, setError]             = useState('')
+  const [name, setName]               = useState('');
+  const [race, setRace]               = useState('');
+  const [settlementSize, setSettlementSize] = useState('');
+  const [shopType, setShopType]       = useState('');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [response, setResponse]       = useState<ShopkeeperResponse | null>(null);
+  const [error, setError]             = useState('');
+  const [message, setMessage] = useState('');
 
+  const hasBadChar = (s: string) => /[\\`'"]/.test(s);
+
+  // Shared for both Submit & Randomize
   const doRequest = async () => {
-    setError('')
-    setLoading(true)
+    setError('');
+    setLoading(true);
     try {
-      const payload: ShopkeeperRequest = { race, settlementSize, shopType }
-      if (name)        payload.name        = name
-      if (description) payload.description = description
+      const payload: ShopkeeperRequest = { race, settlementSize, shopType };
+      if (name.trim())        payload.name        = sanitize(name.trim());
+      if (description.trim()) payload.description = sanitize(description.trim());
 
       const { data } = await axios.post<ShopkeeperResponse>(
         '/api/shopkeeper',
         payload
-      )
-      setResponse(data)
+      );
+      setResponse(data);
     } catch {
-      setError('Error generating shopkeeper.')
+      setError('Error generating shopkeeper.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  // share this for both Submit & Randomize
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    doRequest()
-  }
+    e.preventDefault();
+    if (hasBadChar(name) || hasBadChar(description)) {
+      setMessage('The characters \\ ` \' " are not allowed.');
+      return;
+    }
+    doRequest();
+  };
 
   const handleReroll = () => {
-    if (!response) return
-    doRequest()
-  }
+    if (!response) return;
+    doRequest();
+  };
 
   return (
     <>
-      {/* ← spinner overlay while waiting and no modal open */}
+      {/* spinner overlay while waiting and no modal open */}
       {loading && !response && (
         <div className="loading-backdrop">
           <div className="loading-spinner" />
@@ -95,12 +103,13 @@ const ShopkeeperForm: React.FC = () => {
         <hr />
 
         <label>
-          Name (optional):
+          Shopkeeper Name:
           <input
             className="form-input"
             type="text"
             value={name}
-            onChange={e => setName(e.target.value.replace(/["'\\]/g,''))}
+            onChange={e => setName(e.target.value)}
+            placeholder="(Optional)"
             disabled={loading}
           />
         </label>
@@ -150,7 +159,7 @@ const ShopkeeperForm: React.FC = () => {
             className="form-input"
             placeholder="Optional extra flavor or requirements."
             value={description}
-            onChange={e => setDescription(e.target.value.replace(/["'\\]/g,''))}
+            onChange={e => setDescription(e.target.value)}
             disabled={loading}
           />
         </label>
@@ -159,7 +168,8 @@ const ShopkeeperForm: React.FC = () => {
           Submit
         </button>
 
-        {error && <p className="message">{error}</p>}
+        {message && <p className="message">{message}</p>}
+        {/*error && <p className="message">{error}</p>*/}
       </form>
 
       {response && (
@@ -171,7 +181,7 @@ const ShopkeeperForm: React.FC = () => {
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default ShopkeeperForm
+export default ShopkeeperForm;
