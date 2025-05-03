@@ -99,7 +99,8 @@ const GearForm: React.FC = () => {
     // send right away
     await sendRequest(payload, false);
 
-    // clear form
+    // clear form - Better User Experience Without Clearing the Form?? 
+/*
     setName('');
     setType('');
     setHandedness('');
@@ -107,8 +108,10 @@ const GearForm: React.FC = () => {
     setRarity('');
     setDescription('');
     setClothingPiece('');
+  
+*/ 
   };
-
+  
   // randomize
   const handleRandomize = async () => {
     setLastWasRandom(true);
