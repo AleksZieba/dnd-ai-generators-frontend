@@ -62,7 +62,7 @@ const GearForm: React.FC = () => {
         res = await axios.get<GearResponse>('/api/gear/random');
       } else {
         if (!reqPayload) throw new Error('No payload to send');
-        res = await axios.post<GearResponse>('/api/gear', reqPayload);
+        res = await axios.get<GearResponse>('/api/gear', { params: reqPayload});
       }
       setCurrentResponse(res.data);
       setModalVisible(true);

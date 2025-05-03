@@ -64,9 +64,9 @@ const ShopkeeperForm: React.FC = () => {
         };
         if (name.trim())        payload.name        = sanitize(name.trim());
         if (description.trim()) payload.description = sanitize(description.trim());
-        res = await axios.post<ShopkeeperResponse>(
+        res = await axios.get<ShopkeeperResponse>(
           '/api/shopkeeper',
-          payload
+          { params: payload}
         );
       }
       setResponse(res.data);
