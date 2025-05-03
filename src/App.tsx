@@ -2,6 +2,7 @@
 import NavBar from './components/NavBar';
 import GearForm from './components/GearForm';
 import ShopkeeperForm from './components/ShopkeeperForm';
+import Footer from './components/Footer';
 import './App.css'; 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <ShopkeeperForm />
         </section>
       </main>
+      <Footer />
     </>
   );
 }

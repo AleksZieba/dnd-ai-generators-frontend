@@ -1,0 +1,33 @@
+.footer {
+    position: relative;              
+    background-color: var(--surface);
+    color: var(--text-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    font-size: 0.875rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.4);
+  }
+  
+  .footer-left,
+  .footer-right {
+    flex-shrink: 0;
+  }
+  
+  .footer-center {
+    position: absolute;              
+    left: 50%;                       
+    transform: translateX(-50%);     
+    white-space: nowrap;             
+  }
+  
+  .footer a {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .footer a:hover {
+    color: var(--primary);
+  }
