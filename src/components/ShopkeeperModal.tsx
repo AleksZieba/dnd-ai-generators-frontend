@@ -17,6 +17,25 @@ interface Props {
 }
 
 const ShopkeeperModal: React.FC<Props> = ({ data, onClose, onReroll }) => {
+  // Build a plain‐text version of what the user sees
+  const handleCopy = () => {
+    let text = ''
+    // Header
+    text += `${data.Name || `${data.Race} Shopkeeper`}\n\n`
+    // Fields
+    text += `Race: ${data.Race}\n`
+    text += `Settlement Size: ${data.SettlementSize}\n`
+    text += `Shop Type: ${data.ShopType}\n`
+    if (data.Description) {
+      text += `Description: ${data.Description}\n`
+    }
+    // Items list
+    text += `\nItems For Sale:\n`
+    text += data.ItemsList.map(item => `• ${item}`).join('\n')
+    // Copy to clipboard
+    navigator.clipboard.writeText(text)
+  }
+
   return (
     <div className="modal-backdrop">
       <div className="modal">
@@ -50,9 +69,11 @@ const ShopkeeperModal: React.FC<Props> = ({ data, onClose, onReroll }) => {
         </dl>
 
         <div className="modal-buttons">
-          {/* First-child button will pick up the "primary" styling */}
+          {/* Copy button */}
+          <button onClick={handleCopy}>Copy</button>
+          {/* Reroll button */}
           <button onClick={onReroll}>Re-roll</button>
-          {/* Last-child button is styled as the secondary/close */}
+          {/* Close button */}
           <button onClick={onClose}>Close</button>
         </div>
       </div>
