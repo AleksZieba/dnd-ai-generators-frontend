@@ -1,38 +1,49 @@
 import React from 'react'
-import './ResponseModal.css'  // reuse your modal styles
+import './ResponseModal.css'  // reuse your existing modal styles
 
 export type ShopkeeperResponse = {
   Name: string
   Race: string
   SettlementSize: string
   ShopType: string
-  Description: string
+  Description?: string
   ItemsList: string[]
 }
 
 interface Props {
   data: ShopkeeperResponse
+  loading: boolean            // ← receive loading flag
   onClose: () => void
   onReroll: () => void
 }
 
-const ShopkeeperModal: React.FC<Props> = ({ data, onClose, onReroll }) => {
-  // Build a plain‐text version of what the user sees
+const ShopkeeperModal: React.FC<Props> = ({
+  data,
+  loading,
+  onClose,
+  onReroll
+}) => {
+  // 1) While loading, render only the full-screen spinner overlay:
+  if (loading) {
+    return (
+      <div className="loading-backdrop">
+        <div className="loading-spinner" />
+      </div>
+    )
+  }
+
+  // 2) Once loaded, show your normal modal UI:
   const handleCopy = () => {
     let text = ''
-    // Header
     text += `${data.Name || `${data.Race} Shopkeeper`}\n\n`
-    // Fields
     text += `Race: ${data.Race}\n`
     text += `Settlement Size: ${data.SettlementSize}\n`
     text += `Shop Type: ${data.ShopType}\n`
     if (data.Description) {
-      text += `Description: ${data.Description}\n`
+      text += `Description: ${data.Description}\n\n`
     }
-    // Items list
-    text += `\nItems For Sale:\n`
+    text += `Items For Sale:\n`
     text += data.ItemsList.map(item => `• ${item}`).join('\n')
-    // Copy to clipboard
     navigator.clipboard.writeText(text)
   }
 
@@ -54,7 +65,7 @@ const ShopkeeperModal: React.FC<Props> = ({ data, onClose, onReroll }) => {
           {data.Description && (
             <>
               <dt>Description:</dt>
-              <dd>{data.Description}</dd>
+              <dd style={{ whiteSpace: 'pre-wrap' }}>{data.Description}</dd>
             </>
           )}
 
@@ -69,12 +80,15 @@ const ShopkeeperModal: React.FC<Props> = ({ data, onClose, onReroll }) => {
         </dl>
 
         <div className="modal-buttons">
-          {/* Copy button */}
-          <button onClick={handleCopy}>Copy</button>
-          {/* Reroll button */}
-          <button onClick={onReroll}>Re-roll</button>
-          {/* Close button */}
-          <button onClick={onClose}>Close</button>
+          <button type="button" onClick={onReroll}>
+            Re-roll
+          </button>
+          <button type="button" onClick={handleCopy}>
+            Copy
+          </button>
+          <button type="button" onClick={onClose}>
+            Close
+          </button>
         </div>
       </div>
     </div>

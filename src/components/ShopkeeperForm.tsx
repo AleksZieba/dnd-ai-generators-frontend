@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
-import ResponseModal, { ShopkeeperResponse } from './ShopkeeperModal';
+import ShopkeeperModal, { ShopkeeperResponse } from './ShopkeeperModal';
 import './ShopkeeperForm.css';
 
 interface ShopkeeperRequest {
@@ -32,147 +32,146 @@ const shopTypes = [
 const sanitize = (s: string) => s.replace(/[\\'"`]/g, '');
 
 const ShopkeeperForm: React.FC = () => {
-  const [name, setName]               = useState('');
-  const [race, setRace]               = useState('');
-  const [settlementSize, setSettlementSize] = useState('');
-  const [shopType, setShopType]       = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading]         = useState(false);
-  const [response, setResponse]       = useState<ShopkeeperResponse | null>(null);
-  const [error, setError]             = useState('');
+  const [name, setName]               = useState('')
+  const [race, setRace]               = useState('')
+  const [settlementSize, setSettlementSize] = useState('')
+  const [shopType, setShopType]       = useState('')
+  const [description, setDescription] = useState('')
+  const [loading, setLoading]         = useState(false)
+  const [response, setResponse]       = useState<ShopkeeperResponse | null>(null)
+  const [error, setError]             = useState('')
 
-  // Randomize button → GET /api/shopkeeper/random
-  const handleRandomize = async () => {
-    setError('');
-    setLoading(true);
+  const doRequest = async () => {
+    setError('')
+    setLoading(true)
     try {
-      const { data } = await axios.get<ShopkeeperResponse>('/api/shopkeeper/random');
-      setResponse(data);
-    } catch {
-      setError('Error generating shopkeeper.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      const payload: ShopkeeperRequest = { race, settlementSize, shopType }
+      if (name)        payload.name        = name
+      if (description) payload.description = description
 
-  // Submit form → POST /api/shopkeeper
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const payload: ShopkeeperRequest = { race, settlementSize, shopType };
-      if (name.trim())        payload.name        = sanitize(name.trim());
-      if (description.trim()) payload.description = sanitize(description.trim());
-      const { data } = await axios.post<ShopkeeperResponse>('/api/shopkeeper', payload);
-      setResponse(data);
+      const { data } = await axios.post<ShopkeeperResponse>(
+        '/api/shopkeeper',
+        payload
+      )
+      setResponse(data)
     } catch {
-      setError('Error generating shopkeeper.');
+      setError('Error generating shopkeeper.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
+  // share this for both Submit & Randomize
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    doRequest()
+  }
+
+  const handleReroll = () => {
+    if (!response) return
+    doRequest()
+  }
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
-      <h2>Shopkeeper NPC Generator</h2>
+    <>
+      {/* ← spinner overlay while waiting and no modal open */}
+      {loading && !response && (
+        <div className="loading-backdrop">
+          <div className="loading-spinner" />
+        </div>
+      )}
 
-      <button
-        type="button"
-        onClick={handleRandomize}
-        disabled={loading}
-      >
-        {loading ? 'Loading…' : 'Randomize'}
-      </button>
+      <form className="form" onSubmit={handleSubmit}>
+        <h2>Shopkeeper NPC Generator</h2>
 
-      <hr />
-
-      <label>
-        Name (optional):
-        <input
-          className="form-input"
-          type="text"
-          placeholder="(Optional)"
-          value={name}
+        <button
+          type="button"
+          onClick={doRequest}
           disabled={loading}
-          onChange={e => setName(sanitize(e.target.value))}
-        />
-      </label>
-
-      <label>
-        Race:
-        <select
-          required
-          value={race}
-          disabled={loading}
-          onChange={e => setRace(e.target.value)}
         >
-          <option value="">Select Race</option>
-          {races.map(r => (
-            <option key={r} value={r}>{r}</option>
-          ))}
-        </select>
-      </label>
+          {loading ? 'Loading…' : 'Randomize'}
+        </button>
 
-      <label>
-        Settlement Size:
-        <select
-          required
-          value={settlementSize}
-          disabled={loading}
-          onChange={e => setSettlementSize(e.target.value)}
-        >
-          <option value="">Select Settlement</option>
-          {settlements.map(s => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-      </label>
+        <hr />
 
-      <label>
-        Shop Type:
-        <select
-          required
-          value={shopType}
-          disabled={loading}
-          onChange={e => setShopType(e.target.value)}
-        >
-          <option value="">Select Type</option>
-          {shopTypes.map(s => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-      </label>
+        <label>
+          Name (optional):
+          <input
+            className="form-input"
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value.replace(/["'\\]/g,''))}
+            disabled={loading}
+          />
+        </label>
 
-      <label>
-        Additional Details:
-        <textarea
-          className="form-input"
-          placeholder="Optional extra flavor or requirements..."
-          value={description}
-          disabled={loading}
-          onChange={e => setDescription(sanitize(e.target.value))}
-        />
-      </label>
+        <label>
+          Race:
+          <select
+            required
+            value={race}
+            onChange={e => setRace(e.target.value)}
+            disabled={loading}
+          >
+            <option value="">Select Race</option>
+            {races.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </label>
 
-      <button
-        type="submit"
-        disabled={loading}
-      >
-        Submit
-      </button>
+        <label>
+          Settlement Size:
+          <select
+            required
+            value={settlementSize}
+            onChange={e => setSettlementSize(e.target.value)}
+            disabled={loading}
+          >
+            <option value="">Select Settlement</option>
+            {settlements.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </label>
 
-      {error && <p className="message error">{error}</p>}
+        <label>
+          Shop Type:
+          <select
+            required
+            value={shopType}
+            onChange={e => setShopType(e.target.value)}
+            disabled={loading}
+          >
+            <option value="">Select Type</option>
+            {shopTypes.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </label>
+
+        <label>
+          Additional Details:
+          <textarea
+            className="form-input"
+            placeholder="Optional extra flavor or requirements."
+            value={description}
+            onChange={e => setDescription(e.target.value.replace(/["'\\]/g,''))}
+            disabled={loading}
+          />
+        </label>
+
+        <button type="submit" disabled={loading}>
+          Submit
+        </button>
+
+        {error && <p className="message">{error}</p>}
+      </form>
 
       {response && (
-        <ResponseModal
+        <ShopkeeperModal
           data={response}
+          loading={loading}
           onClose={() => setResponse(null)}
-          onReroll={handleRandomize} 
+          onReroll={handleReroll}
         />
       )}
-    </form>
-  );
-};
+    </>
+  )
+}
 
-export default ShopkeeperForm;
+export default ShopkeeperForm
