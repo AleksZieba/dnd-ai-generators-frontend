@@ -111,7 +111,7 @@ const ShopkeeperForm: React.FC = () => {
       )}
 
       <form className="form" onSubmit={handleSubmit}>
-        <h2>Shopkeeper NPC Generator</h2>
+        <h2>Generate Shopkeeper with Wares</h2>
 
         {/* Randomize button */}
         <button

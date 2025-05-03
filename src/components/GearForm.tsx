@@ -111,7 +111,7 @@ const GearForm: React.FC = () => {
   
 */ 
   };
-  
+
   // randomize
   const handleRandomize = async () => {
     setLastWasRandom(true);
@@ -134,7 +134,7 @@ const GearForm: React.FC = () => {
       )}
 
       <form className="form" onSubmit={handleSubmit}>
-        <h2>Request Gear</h2>
+        <h2>Generate DND 5E Item</h2>
 
         <button
           type="button"

@@ -50,6 +50,15 @@ const NavBar: React.FC = () => {
       >
         NPC Generator
       </a>
+      {/* donate button */}
+      <a
+        href="https://ko-fi.com/alekszieba"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-primary donate-button"
+      >
+        Donate ❤️
+      </a>
     </nav>
   );
 };

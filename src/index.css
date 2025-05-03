@@ -47,6 +47,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .container {
   background-color: transparent;
+} 
+
+.form {
+  margin-top: 2rem;
+}
+
+.shopkeeper-section {
+  margin-top: 4rem;
 }
 
 /* make all form inputs & selects fill their container width */
