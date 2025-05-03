@@ -47,7 +47,7 @@ const GearForm: React.FC = () => {
   const [currentResponse, setCurrentResponse] = useState<GearResponse | null>(null);
   const [lastWasRandom, setLastWasRandom] = useState(false);
   
-  const hasBadChar = (s: string) => /[\\`'"]/.test(s);
+  const hasBadChar = (s: string) => /[\\`'"{}]/.test(s);
 
   // unified send function
   async function sendRequest(
@@ -80,7 +80,7 @@ const GearForm: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (hasBadChar(name) || hasBadChar(description)) {
-      setMessage('The characters \\ ` \' " are not allowed.');
+      setMessage('The characters \\ ` \' " { } are not allowed.');
       return;
     }
 

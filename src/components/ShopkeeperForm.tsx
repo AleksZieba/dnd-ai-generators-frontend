@@ -30,7 +30,7 @@ const shopTypes = [
 ] as const;
 
 // Strip backslashes, quotes, backticks for security
-const sanitize = (s: string) => s.replace(/[\\'"`]/g, '');
+const sanitize = (s: string) => s.replace(/[\\'"`{}]/g, '');
 
 const ShopkeeperForm: React.FC = () => {
   const [name, setName]               = useState('');
@@ -40,11 +40,11 @@ const ShopkeeperForm: React.FC = () => {
   const [description, setDescription] = useState('');
   const [loading, setLoading]         = useState(false);
   const [response, setResponse]       = useState<ShopkeeperResponse | null>(null);
-  const [message, setMessage]         = useState('');  // validation errors
-  const [error, setError]             = useState('');  // request errors
+  const [message, setMessage]         = useState(''); 
+  const [error, setError]             = useState(''); 
   const [lastWasRandom, setLastWasRandom] = useState(false);
 
-  const hasBadChar = (s: string) => /[\\`'"]/.test(s);
+  const hasBadChar = (s: string) => /[\\`'"{}]/.test(s);
 
   // Shared request function, random=true -> GET /api/shopkeeper/random
   const doRequest = async (random = false) => {
@@ -84,7 +84,7 @@ const ShopkeeperForm: React.FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (hasBadChar(name) || hasBadChar(description)) {
-      setMessage('The characters \\ ` \' " are not allowed.');
+      setMessage('The characters \\ ` \' " { } are not allowed.');
       return;
     }
     doRequest(false);
