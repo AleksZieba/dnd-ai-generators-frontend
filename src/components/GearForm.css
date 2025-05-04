@@ -1,8 +1,8 @@
 .form {
-  overflow: hidden; /* added to enable smooth height animations */
+  overflow: hidden; /* enable smooth height animations */
   background: var(--surface);
-  max-width: 480px;
-  margin: 3rem auto;
+  max-width: 500px;
+  margin: 2rem auto;
   padding: 2rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -29,7 +29,9 @@
 .form input,
 .form select,
 .form textarea {
-  padding: 0.5rem 0.75rem;
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
   margin-top: 0.25rem;
   border: 1px solid #374151;
   border-radius: var(--radius);
@@ -37,7 +39,7 @@
   background: var(--bg);
   color: var(--text);
   font-family: inherit;
-  resize: vertical;
+  line-height: 1.4;
 }
 
 .form input::placeholder,
@@ -63,7 +65,7 @@
 
 .form button {
   margin-top: 1rem;
-  padding: 0.75rem;
+  padding: 0.75rem 1.5rem;
   background: var(--primary);
   color: #fff;
   font-size: 1rem;
@@ -71,7 +73,7 @@
   text-shadow:
     1px  1px 0px #000,
     -1px  1px 0px #000,
-    1px -1px 0px #000,
+     1px -1px 0px #000,
     -1px -1px 0px #000;
   border: none;
   border-radius: var(--radius);
@@ -84,10 +86,17 @@
   background: var(--primary-hover);
 }
 
-.form .message {
+.message {
+  margin-top: 1rem;
   text-align: center;
   color: var(--accent);
   font-size: 0.9rem;
+}
+
+.form hr {
+  border: none;
+  border-top: 1px solid #4B5563;
+  margin: 1.5rem 0;
 }
 
 .loading-backdrop {
@@ -109,6 +118,30 @@
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@media (max-width: 600px) {
+  .form {
+    /* exactly match the modal’s constraints */
+    width: 90vw;
+    max-width: 600px;
+    margin: 1rem auto;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+  .gearform-label {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  .form button.randomize-button {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+  .form hr {
+    margin: 0.5rem 0;
+  }
+  .form button[type="button"],
+  .form button[type="submit"] {
+    display: block;
+    width: 100%;
+    margin: 0.6rem 0;
+  }
 }

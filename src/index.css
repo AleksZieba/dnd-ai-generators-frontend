@@ -71,6 +71,29 @@ select {
 }
 
 @media (max-width: 600px) {
-  .form { margin: 1rem; padding: 1rem; }
-  .modal { width: 95%; }
+  .form {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+  .shopkeeper-section {
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  .modal {
+    width: 95%;
+    box-sizing: border-box;
+  }
+  /* Tweak font sizes for mobile */
+  body {
+    font-size: 0.9rem;
+  }
+  h2 {
+    font-size: 1.3rem;
+  }
+  .modal-list dt {
+    font-size: 1rem;
+  }
+  .modal-list dd {
+    font-size: 0.85rem;
+  }
 }

@@ -2,12 +2,9 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-
-  /* 1) force everything onto one line */
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-
   background-color: var(--surface);
   color: var(--text-light);
   box-shadow: var(--shadow);
@@ -15,13 +12,10 @@
   padding: 0.75rem 1.5rem;
 }
 
-/* 2) brand never shrinks or wraps */
 .navbar-brand {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
-  /* don’t let it shrink when space is tight */
   flex-shrink: 0;
 }
 
@@ -36,36 +30,32 @@
 .brand-logo {
   height: 1.75rem;
   width: auto;
+  filter: brightness(0) invert(1);
 }
 
-/* 3) links take all remaining space, centered */
 .navbar-links {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
-
-  /* flex:1 so it expands and pushes brand + donate outwards */
   flex: 1;
 }
 
-/* link styling unchanged */
 .navbar-links a {
   color: inherit;
   text-decoration: none;
   font-family: 'Lato', sans-serif;
   transition: color 0.2s;
 }
+
 .navbar-links a:hover,
 .navbar-links a.active {
   color: var(--text);
 }
 
-/* 4) donate button never shrinks */
 .donate-button {
   flex-shrink: 0;
 }
 
-/* primary button styling (unchanged) */
 .btn-primary {
   background-color: var(--primary);
   color: var(--text);
@@ -82,7 +72,6 @@
   background-color: var(--primary-hover);
 }
 
-/* secondary & accent (unchanged) */
 .btn-secondary {
   background-color: transparent;
   color: var(--text-light);
@@ -114,7 +103,7 @@
 
 @media (orientation: portrait) {
   .brand-title {
-    font-size: 1rem; /* was 1.25rem */ 
+    font-size: 1rem; /* was 1.25rem */
   }
 
   .navbar-links a,
@@ -124,5 +113,59 @@
 
   .navbar-links {
     gap: 0.75rem;  /* was 1.5rem */
+  }
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    padding: 0.5rem 1rem;
+  }
+  .brand-logo {
+    height: 1.5rem;
+  }
+  .brand-title {
+    font-size: 1.1rem;
+  }
+  .navbar-links {
+    gap: 1rem;
+  }
+  .btn-primary,
+  .btn-secondary,
+  .btn-accent {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.4rem 0.75rem;
+  }
+  .brand-logo {
+    height: 1.25rem;
+  }
+  .brand-title {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  .navbar-brand {
+    width: 100%;
+    justify-content: flex-start;
+    margin-bottom: 0.25rem;
+  }
+  .navbar-links {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    flex: none;
+  }
+  .navbar-links a {
+    font-size: 0.8rem;
+  }
+  .donate-button {
+    display: none;
   }
 }
