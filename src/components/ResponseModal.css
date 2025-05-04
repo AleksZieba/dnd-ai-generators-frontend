@@ -113,7 +113,7 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 60px) {
   .modal {
     width: 95%;
     padding: 1rem;
