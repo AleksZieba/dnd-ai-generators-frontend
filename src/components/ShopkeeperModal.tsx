@@ -83,7 +83,7 @@ const ShopkeeperModal: React.FC<Props> = ({
           <button type="button" onClick={onReroll}>
             Re-roll
           </button>
-          <button type="button" onClick={handleCopy}>
+          <button className="copy-button" type="button" onClick={handleCopy}>
             Copy
           </button>
           <button type="button" onClick={onClose}>
