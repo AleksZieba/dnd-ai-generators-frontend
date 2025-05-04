@@ -1,4 +1,3 @@
-/* 1) Full‐viewport reset */
 html, body, #root {
   margin: 0;
   padding: 0;
@@ -6,7 +5,6 @@ html, body, #root {
   width: 100%;
 }
 
-/* 2) Your dark theme variables */
 :root {
   --bg:            #111827;
   --surface:       #1F2937;
@@ -21,7 +19,6 @@ html, body, #root {
   --shadow:        0 4px 12px rgba(0,0,0,0.4);
 }
 
-/* 3) Body uses Lato */
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -34,14 +31,6 @@ body {
   -1px -1px 0px #000;
 }
 
-/*
-body *[style*="color: #fff"],
-body *[style*="color: var(--text)"] {
-  text-shadow: none;
-} 
-*/
-
-/* 4) All headings use Tagesschrift */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Tagesschrift', serif;
   margin: 0;
@@ -59,7 +48,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 4rem;
 }
 
-/* make all form inputs & selects fill their container width */
 .form-input {
   width: 100%;
   padding: 0.5rem;
@@ -73,7 +61,6 @@ h1, h2, h3, h4, h5, h6 {
   min-width: 8ch;
 }
 
-/* if you still have standalone <select> elements without .form-input */
 select {
   width: 100%;
   box-sizing: border-box;

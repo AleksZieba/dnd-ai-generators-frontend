@@ -97,7 +97,6 @@
     -1px  1px 0px #000,
     1px -1px 0px #000,
     -1px -1px 0px #000;
-    /* inherit the responsive font-size */
   }
   
   .modal-buttons button.copy-button {

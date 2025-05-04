@@ -1,6 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import ResponseModal, { GearResponse } from './ResponseModal';
+import { AnimatePresence, motion } from 'framer-motion';
 import './GearForm.css';
 
 interface GearRequest {
@@ -49,7 +50,6 @@ const GearForm: React.FC = () => {
   
   const hasBadChar = (s: string) => /[\\`'"{}]/.test(s);
 
-  // unified send function
   async function sendRequest(
     reqPayload: GearRequest | null,
     random = false
@@ -76,7 +76,6 @@ const GearForm: React.FC = () => {
     }
   }
 
-  // form submit
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (hasBadChar(name) || hasBadChar(description)) {
@@ -84,7 +83,6 @@ const GearForm: React.FC = () => {
       return;
     }
 
-    // build payload
     const payload: GearRequest = { type: type as any, subtype, rarity };
     if (name.trim())          payload.name           = name.trim();
     if (type === 'Weapon')    payload.handedness     = handedness as any;
@@ -92,49 +90,32 @@ const GearForm: React.FC = () => {
                                payload.clothingPiece  = clothingPiece;
     if (description.trim())   payload.description    = description.trim();
 
-    // save for reroll
     setLastRequest(payload);
     setLastWasRandom(false);
 
-    // send right away
     await sendRequest(payload, false);
-
-    // clear form - Better User Experience Without Clearing the Form?? 
-/*
-    setName('');
-    setType('');
-    setHandedness('');
-    setSubtype('');
-    setRarity('');
-    setDescription('');
-    setClothingPiece('');
-  
-*/ 
   };
 
-  // randomize
   const handleRandomize = async () => {
     setLastWasRandom(true);
     setLastRequest(null);
     await sendRequest(null, true);
   };
 
-  // reroll uses same logic
   const handleReroll = async () => {
     await sendRequest(lastRequest, lastWasRandom);
   };
 
   return (
     <>
-      {/* loading spinner */}
       {loading && (
         <div className="loading-backdrop">
           <div className="loading-spinner" />
         </div>
       )}
 
-      <form className="form" onSubmit={handleSubmit}>
-        <h2>Generate DND 5E Item</h2>
+      <motion.form className="form" onSubmit={handleSubmit}>
+        <h2 className="gearform-label">Generate DND 5E Item</h2>
 
         <button
           type="button"
@@ -180,102 +161,158 @@ const GearForm: React.FC = () => {
           </select>
         </label>
 
-      {type === 'Jewelry' && (
-        <label>
-          Jewelry Category:
-          <select 
-            className="form-input"
-            value={subtype}
-            onChange={e => setSubtype(e.target.value)}
-            required
-          >
-            <option value="">Select Category</option>
-            <option value="Ring">Ring</option>
-            <option value="Necklace">Necklace</option>
-          </select>
-        </label>
-      )}
-
-        {type === 'Weapon' && (
-          <label>
-            Weapon Category:
-            <select
-              className="form-input"
-              value={handedness}
-              onChange={e => {
-                setHandedness(e.target.value as any);
-                setSubtype('');
-              }}
-              required
-              disabled={loading}
+        <AnimatePresence initial={false}>
+          {type === 'Jewelry' && (
+            <motion.div
+              key="jewelry"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ overflow: 'hidden' }}
             >
-              <option value="">Select Category</option>
-              {weaponHandOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
-        )}
+              <label>
+                Jewelry Category:
+                <select
+                  className="form-input"
+                  value={subtype}
+                  onChange={e => setSubtype(e.target.value)}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Select Category</option>
+                  <option value="Ring">Ring</option>
+                  <option value="Necklace">Necklace</option>
+                </select>
+              </label>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {type === 'Weapon' && handedness && (
-          <label>
-            Weapon Type:
-            <select
-              className="form-input"
-              value={subtype}
-              onChange={e => setSubtype(e.target.value)}
-              required
-              disabled={loading}
+        <AnimatePresence initial={false}>
+          {type === 'Weapon' && (
+            <motion.div
+              key="weapon-cat"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ overflow: 'hidden' }}
             >
-              <option value="">Select Weapon</option>
-              {weaponTypeOptions[handedness].map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
-        )}
+              <label>
+                Weapon Category:
+                <select
+                  className="form-input"
+                  value={handedness}
+                  onChange={e => {
+                    setHandedness(e.target.value as any);
+                    setSubtype('');
+                  }}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Select Category</option>
+                  {weaponHandOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </label>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {type === 'Armor' && (
-          <label>
-            Armor Class:
-            <select
-              className="form-input"
-              value={subtype}
-              onChange={e => {
-                setSubtype(e.target.value);
-                setClothingPiece('');
-              }}
-              required
-              disabled={loading}
+        <AnimatePresence initial={false}>
+          {type === 'Weapon' && handedness && (
+            <motion.div
+              key="weapon-type"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ overflow: 'hidden' }}
             >
-              <option value="">Select Armor Class</option>
-              {armorOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
-        )}
+              <label>
+                Weapon Type:
+                <select
+                  className="form-input"
+                  value={subtype}
+                  onChange={e => setSubtype(e.target.value)}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Select Weapon</option>
+                  {weaponTypeOptions[handedness].map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </label>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {type === 'Armor' && subtype && subtype !== 'Shield' && (
-          <label>
-            {subtype === 'Clothes' ? 'Clothing Piece:' : 'Armor Piece:'}
-            <select
-              className="form-input"
-              value={clothingPiece}
-              onChange={e => setClothingPiece(e.target.value)}
-              required
-              disabled={loading}
+        <AnimatePresence initial={false}>
+          {type === 'Armor' && (
+            <motion.div
+              key="armor-class"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ overflow: 'hidden' }}
             >
-              <option value="">Select Piece</option>
-              {(subtype === 'Clothes'
-                ? ['Boots','Clothes','Cloak','Gloves','Headgear','Robes','Shoes']
-                : ['Boots','Chest Armor','Greaves','Headgear']
-              ).map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </label>
-        )}
+              <label>
+                Armor Class:
+                <select
+                  className="form-input"
+                  value={subtype}
+                  onChange={e => {
+                    setSubtype(e.target.value);
+                    setClothingPiece('');
+                  }}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Select Armor Class</option>
+                  {armorOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </label>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence initial={false}>
+          {type === 'Armor' && subtype && subtype !== 'Shield' && (
+            <motion.div
+              key="armor-piece"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ overflow: 'hidden' }}
+            >
+              <label>
+                {subtype === 'Clothes' ? 'Clothing Piece:' : 'Armor Piece:'}
+                <select
+                  className="form-input"
+                  value={clothingPiece}
+                  onChange={e => setClothingPiece(e.target.value)}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Select Piece</option>
+                  {(subtype === 'Clothes'
+                    ? ['Boots','Clothes','Cloak','Gloves','Headgear','Robes','Shoes']
+                    : ['Boots','Chest Armor','Greaves','Headgear']
+                  ).map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </label>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <label>
           Rarity:
@@ -303,7 +340,6 @@ const GearForm: React.FC = () => {
             value={description}
             onChange={e => setDescription(e.target.value)}
             placeholder="Optional extra flavor or requirements..."
-            // rows={3}
             disabled={loading}
           />
         </label>
@@ -313,7 +349,7 @@ const GearForm: React.FC = () => {
         </button>
 
         {message && <p className="message">{message}</p>}
-      </form>
+      </motion.form>
 
       {modalVisible && currentResponse && (
         <ResponseModal

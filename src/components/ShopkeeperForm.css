@@ -7,10 +7,10 @@
     box-shadow: var(--shadow);
   }
   
-  .form h2 {
+  .shopkeeper-label {
     margin-top: 0;
     font-family: "Tagesschrift", sans-serif;
-    color: var(--primary);
+    color: #a335ee;
     font-size: 1.8rem;
     text-align: center;
   }

@@ -1,5 +1,5 @@
 import React from 'react'
-import './ResponseModal.css'  // reuse your existing modal styles
+import './ResponseModal.css' 
 
 export type ShopkeeperResponse = {
   Name: string
@@ -12,7 +12,7 @@ export type ShopkeeperResponse = {
 
 interface Props {
   data: ShopkeeperResponse
-  loading: boolean            // ← receive loading flag
+  loading: boolean           
   onClose: () => void
   onReroll: () => void
 }

@@ -29,7 +29,6 @@ const shopTypes = [
   'Leatherworker','Pawnshop','Tailor'
 ] as const;
 
-// Strip backslashes, quotes, backticks for security
 const sanitize = (s: string) => s.replace(/[\\'"`{}]/g, '');
 
 const ShopkeeperForm: React.FC = () => {
@@ -80,7 +79,6 @@ const ShopkeeperForm: React.FC = () => {
     }
   };
 
-  // handle normal submit
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (hasBadChar(name) || hasBadChar(description)) {
@@ -90,12 +88,10 @@ const ShopkeeperForm: React.FC = () => {
     doRequest(false);
   };
 
-  // randomize
   const handleRandomize = () => {
     doRequest(true);
   };
 
-  // reroll
   const handleReroll = () => {
     if (!response) return;
     doRequest(lastWasRandom);
@@ -111,7 +107,7 @@ const ShopkeeperForm: React.FC = () => {
       )}
 
       <form className="form" onSubmit={handleSubmit}>
-        <h2>Generate Shopkeeper with Wares</h2>
+        <h2 className="shopkeeper-label">Generate Shopkeeper with Wares</h2>
 
         {/* Randomize button */}
         <button
@@ -189,7 +185,6 @@ const ShopkeeperForm: React.FC = () => {
           />
         </label>
 
-        {/* Submit button shows loading only on normal submits */}
         <button
           type="submit"
           disabled={loading && !lastWasRandom}
@@ -201,7 +196,6 @@ const ShopkeeperForm: React.FC = () => {
         {error   && <p className="message">{error}</p>}
       </form>
 
-      {/* Modal */}
       {response && (
         <ShopkeeperModal
           data={response}
