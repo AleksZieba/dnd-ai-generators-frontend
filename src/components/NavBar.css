@@ -2,10 +2,12 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+
+  /* 1) force everything onto one line */
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  /* keep the left links together, donate pushed right */
-  gap: 1rem;
+
   background-color: var(--surface);
   color: var(--text-light);
   box-shadow: var(--shadow);
@@ -13,26 +15,57 @@
   padding: 0.75rem 1.5rem;
 }
 
-/* left‐side links */
-.navbar a {
+/* 2) brand never shrinks or wraps */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  /* don’t let it shrink when space is tight */
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-family: "Tagesschrift", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.25rem;
+  color: #e40712;
+}
+
+.brand-logo {
+  height: 1.75rem;
+  width: auto;
+}
+
+/* 3) links take all remaining space, centered */
+.navbar-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+
+  /* flex:1 so it expands and pushes brand + donate outwards */
+  flex: 1;
+}
+
+/* link styling unchanged */
+.navbar-links a {
   color: inherit;
   text-decoration: none;
-  margin: 0 0.75rem;
   font-family: 'Lato', sans-serif;
   transition: color 0.2s;
 }
-
-.navbar a:hover,
-.navbar a.active {
+.navbar-links a:hover,
+.navbar-links a.active {
   color: var(--text);
 }
 
-.navbar a.donate-button {
-  margin-left: auto;
-
+/* 4) donate button never shrinks */
+.donate-button {
+  flex-shrink: 0;
 }
 
-/* primary button style already defined */
+/* primary button styling (unchanged) */
 .btn-primary {
   background-color: var(--primary);
   color: var(--text);
@@ -41,15 +74,15 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   cursor: pointer;
+  text-decoration: none;
   font-family: 'Lato', sans-serif;
   transition: background-color 0.2s;
 }
-
 .btn-primary:hover {
   background-color: var(--primary-hover);
 }
 
-/* secondary & accent styles left unchanged */
+/* secondary & accent (unchanged) */
 .btn-secondary {
   background-color: transparent;
   color: var(--text-light);
@@ -57,6 +90,7 @@
   padding: 0.5rem 1rem;
   border-radius: var(--radius);
   cursor: pointer;
+  text-decoration: none;
   font-family: 'Lato', sans-serif;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -64,7 +98,6 @@
   background-color: var(--field-bg);
   color: var(--text);
 }
-
 .btn-accent {
   background-color: var(--accent);
   color: var(--text);
@@ -76,5 +109,20 @@
   transition: background-color 0.2s;
 }
 .btn-accent:hover {
-  background-color: #ea5454; /* ~10% darker */
+  background-color: #ea5454;
+}
+
+@media (orientation: portrait) {
+  .brand-title {
+    font-size: 1rem; /* was 1.25rem */ 
+  }
+
+  .navbar-links a,
+  .btn-primary {
+    font-size: 0.9rem;
+  }
+
+  .navbar-links {
+    gap: 0.75rem;  /* was 1.5rem */
+  }
 }

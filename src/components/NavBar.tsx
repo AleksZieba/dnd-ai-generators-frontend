@@ -19,7 +19,7 @@ const NavBar: React.FC = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // initialize
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -36,21 +36,37 @@ const NavBar: React.FC = () => {
 
   return (
     <nav className="navbar">
-      <a
-        href="#equipment"
-        className={active === '#equipment' ? 'active' : ''}
-        onClick={scrollTo('equipment')}
-      >
-        Equipment Generator
-      </a>
-      <a
-        href="#npc"
-        className={active === '#npc' ? 'active' : ''}
-        onClick={scrollTo('npc')}
-      >
-        NPC Generator
-      </a>
-      {/* donate button */}
+      <div className="navbar-brand">
+        <span className="tagesschrift-regular brand-title">
+          Magic DND Generator
+        </span>
+        <img
+          src="/dragon-logo.svg"
+          alt="Dragon Logo"
+          className="brand-logo"
+        />
+      </div>
+
+      <div className="navbar-links">
+        <a
+          href="#equipment"
+          className={active === '#equipment' ? 'active' : ''}
+          onClick={scrollTo('equipment')}
+        >
+          Equipment Generator
+        </a>
+        <a
+          href="#npc"
+          className={active === '#npc' ? 'active' : ''}
+          onClick={scrollTo('npc')}
+        >
+          NPC Generator
+        </a>
+        <a className="comingsoon">
+          Character Sheet Gen. (Coming Soon)
+        </a>
+      </div>
+
       <a
         href="https://ko-fi.com/alekszieba"
         target="_blank"

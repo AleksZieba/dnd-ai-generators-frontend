@@ -13,13 +13,7 @@ const Footer: React.FC = () => {
         © {year} Aleks Zieba
       </div>
       <div className="footer-right">
-        <a
-          href="https://ko-fi.com/alekszieba"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Donate ❤️
-        </a>
+        <a href="https://www.vecteezy.com/free-vector/symbol"> Symbol Vectors by Vecteezy</a>
       </div>
     </footer>
   );
