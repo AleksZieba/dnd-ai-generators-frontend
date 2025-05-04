@@ -187,7 +187,7 @@ const ResponseModal: React.FC<ResponseModalProps> = ({
           >
             {loading ? 'Loading…' : 'Re-roll'}
           </button>
-          <button
+          <button className="copy-button"
             onClick={() => {
               navigator.clipboard.writeText(formatPlainText(data));
             }}

@@ -73,6 +73,11 @@
   color: #fff;
   font-size: 1rem;
   font-weight: 500;
+  text-shadow:
+  1px  1px 0px #000,
+  -1px  1px 0px #000,
+  1px -1px 0px #000,
+  -1px -1px 0px #000;
   border: none;
   border-radius: var(--radius);
   cursor: pointer;

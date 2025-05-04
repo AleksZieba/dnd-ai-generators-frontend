@@ -92,9 +92,18 @@
     font-weight: 500;
     transition: background 0.2s ease;
     box-shadow: var(--shadow);
+    text-shadow:
+    1px  1px 0px #000,
+    -1px  1px 0px #000,
+    1px -1px 0px #000,
+    -1px -1px 0px #000;
     /* inherit the responsive font-size */
   }
   
+  .modal-buttons button.copy-button {
+    text-shadow: none;
+  }
+
   .modal-buttons button:first-child {
     background: var(--primary);
     color: #fff;
