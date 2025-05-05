@@ -5,8 +5,7 @@ A single‐page application for generating custom Dungeons & Dragons gear and sh
 ---
 
 ## Table of Contents
-
-# - [Demo](#demo)  
+ 
 - [Features](#features)  
 - [Tech Stack](#tech-stack)  
 - [Getting Started](#getting-started)  
