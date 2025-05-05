@@ -19,11 +19,6 @@ A single‐page application for generating custom Dungeons & Dragons gear and sh
 # - [Available Scripts](#available-scripts)  
 # - [Contributing](#contributing)  
 - [License](#license)  
-#
-# ---
-#
-# ## Demo
-#
 # ![Demo of the gear and shopkeeper generator in action](https://user-images.githubusercontent.com/your-username/demo.gif)
 
 --- 
