@@ -16,8 +16,6 @@ A single‐page application for generating custom Dungeons & Dragons gear and sh
   - [Building for Production](#building-for-production)  
 - [Project Structure](#project-structure)  
 - [Configuration](#configuration)  
-# - [Available Scripts](#available-scripts)  
-# - [Contributing](#contributing)  
 - [License](#license)  
 # ![Demo of the gear and shopkeeper generator in action](https://user-images.githubusercontent.com/your-username/demo.gif)
 
@@ -127,7 +125,7 @@ The preview server also runs on port 4173 by default.
     The frontend assumes your backend is running on `http://localhost:5000`. If you host elsewhere, update the proxy or switch to an absolute URL in your `axios` calls.
 
 ## License 
-This project is licensed under the GNU GPL v3 included in the root directory. 
+This project is licensed under the GNU GPL v3 viewable [here.](https://github.com/AleksZieba/dnd-ai-generators-frontend/blob/main/LICENSE.md)
 
 
 
