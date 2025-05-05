@@ -1,6 +1,6 @@
 # D&D Gear Generator Frontend
 
-A single‐page application for generating custom Dungeons & Dragons gear and shopkeeper profiles. Built with React, TypeScript and Vite, it consumes a backend API to send and fetch prompts to Gemini 2.0 Flash and GPT 4.1-mini. 
+A single‐page application for generating custom Dungeons & Dragons gear and shopkeeper profiles live here: [dndgamegen.com](https://dndgamegen.com). Built with React, TypeScript and Framer Motion, it consumes a backend API to send and fetch prompts to Gemini 2.0 Flash and GPT 4.1-mini. 
 
 ---
 
@@ -17,7 +17,6 @@ A single‐page application for generating custom Dungeons & Dragons gear and sh
 - [Configuration](#configuration)  
 - [License](#license)  
 # ![Demo of the gear and shopkeeper generator in action](https://user-images.githubusercontent.com/your-username/demo.gif)
-
 --- 
 
 ## Features
@@ -51,6 +50,7 @@ A single‐page application for generating custom Dungeons & Dragons gear and sh
 - **Node.js** v16+  
 - **npm** v8+ (or **Yarn** v1.22+)  
 
+
 ### Installation
 
 1. **Clone the repo**  
@@ -75,6 +75,8 @@ npm run dev
 yarn dev
 ``` 
 Open your browser to http://localhost:5173. 
+
+---
 
 ## Building for Production 
 1. **Build Assets** 
@@ -116,12 +118,16 @@ The preview server also runs on port 4173 by default.
 └── README.md                 # ← You are here
 ``` 
 
+--- 
+
 ## Configuration
 -   **Vite Proxy**
     In `vite.config.ts`, all requests to `/api/*` are forwarded to `http://localhost:5000`.
 
 -   **API Base URL**
     The frontend assumes your backend is running on `http://localhost:5000`. If you host elsewhere, update the proxy or switch to an absolute URL in your `axios` calls.
+
+--- 
 
 ## License 
 This project is licensed under the GNU GPL v3 viewable [here.](https://github.com/AleksZieba/dnd-ai-generators-frontend/blob/main/LICENSE.md)
